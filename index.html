@@ -230,6 +230,7 @@ function build(){
   if(!(size>0.5&&size<60)){err.textContent="System size should be between 1 and 60 kW.";return;}
   err.textContent="";
 
+  const inPGE = Object.prototype.hasOwnProperty.call(ZIPC, zip);
   const county = ZIPC[zip] || "";
   const clim = DATA.cc[county] || "inland";
   const stor = bkwh>0 ? 1 : 0;
@@ -258,7 +259,9 @@ function build(){
     const lo = Math.round(d.batt[0]*k/10)*10, hi = Math.round(d.batt[1]*k/10)*10;
     struct += `<div class="finding"><p><strong>Your battery is probably costing you money.</strong></p>
       <p>On NEM 2.0, every kilowatt-hour you export is credited at the full retail rate. Storing a kilowatt-hour to use at night and sending it straight to the grid at noon are worth <em>exactly the same</em> on your bill. The battery captures no price spread — but it still takes on cycling wear.</p>
-      <p>Switching it to backup-only, no daily cycling, should save roughly <strong>${money(lo)}–${money(hi)} a year</strong> with no loss in bill savings.</p>
+      <p>Switching it to backup-only, no daily cycling, ${inPGE
+        ? `should save roughly <strong>${lo===hi?money(lo):money(lo)+"–"+money(hi)} a year</strong> with no loss in bill savings`
+        : `stops that wear at no cost to your bill. We're not quoting a dollar figure because ours is priced on PG&amp;E's tariff and you're not on it — but the direction is the same on any full-retail net metering tariff`}.</p>
       <p class="prov">This held in every "NEM 2.0 + battery" case in our model. It depends only on your tariff and battery size, not on your usage. It does not apply on NEM 3.0, where the spread is real.</p></div>`;
   }
   if(stor && nem==="3.0"){
@@ -289,6 +292,7 @@ My system:
 - System size: ${size} kW
 - Battery: ${bkwh>0?bkwh+" kWh":"none"}
 - Installer: ${inst||"—"}
+- Utility: ${inPGE ? "PG&E (from ZIP)" : "NOT PG&E — outside covered territory"}
 
 (Reply and I'll send the Green Button steps.)`);
 
@@ -304,6 +308,15 @@ My system:
     ${struct}
   </section>
 
+  ${!inPGE ? `
+  <section class="tier t-guess">
+    <div class="tier-hd"><span class="tag">Not estimated</span><h2>We can't put dollar figures on your house yet</h2>
+      <span class="note">outside PG&amp;E territory</span></div>
+    <div class="finding"><p><strong>${esc(zip)} isn't in PG&amp;E's service territory</strong> — it's most likely Southern California Edison, SDG&amp;E, or a municipal utility.</p>
+      <p>Everything we price is built on PG&amp;E's 2026 tariffs and PG&amp;E's hourly export values. Those numbers are wrong for your utility — often by a lot, because peak windows and rate differentials aren't the same. So we're not going to show them to you.</p>
+      <p>The two sections above still hold. Your installer's status is a matter of public record, and NEM 2.0 vs. NEM 3.0 is a statewide CPUC program that works the same way in all three utilities. It's only the dollar amounts that are PG&amp;E-shaped.</p>
+      <p class="prov">Send us the email below anyway if you'd like — we'll tell you when your utility is covered, and the free fixes in the section above don't depend on any of this.</p></div>
+  </section>` : `
   <section class="tier t-guess">
     <div class="tier-hd"><span class="tag">Estimated</span><h2>Depends on assumptions about your usage</h2>
       <span class="note">a range for homes like yours, not your number</span></div>
@@ -327,11 +340,11 @@ My system:
     <div class="finding"><p>Within that range, the typical size of each item:</p>
       <ul class="items">${meds}</ul>
       <p class="prov">These are medians for similar homes, not figures for your house. The always-on load especially — we have no way to know whether yours is 300 W or 1,000 W, and that one is often the largest single item on the list.</p></div>
-  </section>
+  </section>`}
 
   <section class="cta">
     <h2>What we can tell you once you connect your data</h2>
-    <p style="margin:0">Sharing your PG&amp;E 15-minute usage data (Green Button — one authorization, revocable any time) collapses every bar above into a single number, and gets specific:</p>
+    <p style="margin:0">Sharing your ${inPGE?"PG&amp;E":"utility's"} 15-minute usage data (Green Button — one authorization, revocable any time) ${inPGE?"collapses every bar above into a single number, and gets":"gets"} specific:</p>
     <ul>
       <li>Which rate plan you should be on, and what the switch saves each month — recalculated against your actual last 12 months</li>
       <li>What that device drawing power at 3 a.m. is, and what it costs you a year</li>
@@ -341,7 +354,7 @@ My system:
     <a class="btn" href="mailto:${CONTACT}?subject=${subject}&body=${body}">Get the full report</a>
     <ol class="steps">
       <li>Your mail app opens with the five details above already filled in. Edit or delete anything before sending.</li>
-      <li>We send you PG&amp;E's Green Button steps. About two minutes.</li>
+      <li>We send you ${inPGE?"PG&amp;E's":"your utility's"} Green Button steps. About two minutes.</li>
       <li>You get the full report within 48 hours.</li>
     </ol>
     <p class="fine">We don't sell your data or pass it to anyone. You can revoke access from your PG&amp;E account at any time. Right now a person reads every request — we're early, and we'd rather do this properly than at scale. <a href="data-use.html" target="_blank" rel="noopener">What happens to your data →</a></p>
