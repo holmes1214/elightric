@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="What happens to your PG&E usage data, and how to have it deleted.">
+<meta name="robots" content="noindex">
+<style>
+  :root{color-scheme:light dark}
+  body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+</style>
+<title>What Happens To Your Data</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+</head>
+<body>
+<style>
+:root{
+  --paper:#F2F5F1; --surface:#FFFFFF; --surface-2:#E9EEE8;
+  --ink:#13201A; --ink-2:#3D4E45; --ink-3:#6B7A72;
+  --rule:#D2DBD0; --rule-2:#BFCCBC;
+  --known:#1E6B4A; --known-wash:#E2EFE7;
+  --no:#A23B1E; --no-wash:#F7E9E3;
+  --shadow:0 1px 2px rgba(19,32,26,.05),0 8px 24px -12px rgba(19,32,26,.18);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0E1512; --surface:#161F1A; --surface-2:#1E2922;
+  --ink:#E8EFE9; --ink-2:#B4C2B8; --ink-3:#87968C;
+  --rule:#2A362F; --rule-2:#3A4941;
+  --known:#5FC896; --known-wash:#17301F;
+  --no:#E88A67; --no-wash:#331C13;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+}}
+:root[data-theme="dark"]{
+  --paper:#0E1512; --surface:#161F1A; --surface-2:#1E2922;
+  --ink:#E8EFE9; --ink-2:#B4C2B8; --ink-3:#87968C;
+  --rule:#2A362F; --rule-2:#3A4941;
+  --known:#5FC896; --known-wash:#17301F;
+  --no:#E88A67; --no-wash:#331C13;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:"IBM Plex Serif",Georgia,serif;
+  font-size:16.5px;line-height:1.6;margin:0;-webkit-font-smoothing:antialiased}
+.wrap{max-width:40rem;margin:0 auto;padding:2.5rem 1.25rem 4.5rem;display:flex;flex-direction:column;gap:2.2rem}
+h1,h2,.ui{font-family:"IBM Plex Sans",system-ui,sans-serif}
+h1{font-size:clamp(1.65rem,5.5vw,2.15rem);line-height:1.16;margin:0;font-weight:600;letter-spacing:-.02em;text-wrap:balance}
+.dek{color:var(--ink-2);margin:0;font-size:1rem}
+.badge{display:inline-flex;align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:.65rem;
+  letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);border:1px dashed var(--rule-2);
+  border-radius:2px;padding:.3rem .6rem}
+.mast{display:flex;flex-direction:column;gap:.8rem}
+
+section{display:flex;flex-direction:column;gap:.7rem}
+h2{font-size:1.02rem;margin:0;font-weight:600;letter-spacing:-.01em}
+p{margin:0}
+.lede{font-size:1.02rem}
+
+.file{background:var(--surface);border:1px solid var(--rule);border-radius:3px;
+  box-shadow:var(--shadow);overflow:hidden}
+.file-hd{padding:.75rem 1.1rem;border-bottom:1px solid var(--rule);background:var(--surface-2);
+  font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.05em;color:var(--ink-2)}
+.file-body{padding:1.1rem;display:flex;flex-direction:column;gap:.7rem}
+.strip{background:var(--no-wash);border-left:3px solid var(--no);padding:.7rem .85rem;
+  font-family:"IBM Plex Sans",sans-serif;font-size:.89rem;color:var(--ink-2)}
+
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:1rem}
+.col{background:var(--surface);border:1px solid var(--rule);border-radius:3px;padding:1rem 1.1rem;
+  display:flex;flex-direction:column;gap:.55rem}
+.col h3{margin:0;font-family:"IBM Plex Sans",sans-serif;font-size:.76rem;letter-spacing:.09em;
+  text-transform:uppercase;font-weight:600}
+.col.yes h3{color:var(--known)}
+.col.no h3{color:var(--no)}
+.col ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:.45rem}
+.col li{font-family:"IBM Plex Sans",sans-serif;font-size:.9rem;line-height:1.45;padding-left:1.1rem;position:relative}
+.col.yes li::before{content:"—";position:absolute;left:0;color:var(--known)}
+.col.no li::before{content:"✕";position:absolute;left:0;color:var(--no);font-size:.8em;top:.12em}
+
+.facts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.facts li{display:flex;gap:1rem;justify-content:space-between;align-items:baseline;
+  padding:.6rem 0;border-bottom:1px dotted var(--rule)}
+.facts li:last-child{border-bottom:0}
+.facts .k{font-family:"IBM Plex Sans",sans-serif;font-size:.87rem;color:var(--ink-3);flex:0 0 auto}
+.facts .v{font-family:"IBM Plex Sans",sans-serif;font-size:.91rem;text-align:right}
+
+.delete{background:var(--known-wash);border:1px solid var(--known);border-radius:3px;
+  padding:1.2rem 1.25rem;display:flex;flex-direction:column;gap:.6rem}
+.delete h2{color:var(--known)}
+.mono{font-family:"IBM Plex Mono",monospace;font-size:.92em}
+
+footer{border-top:1px solid var(--rule);padding-top:1.15rem;display:flex;flex-direction:column;gap:.5rem}
+footer p{font-family:"IBM Plex Sans",sans-serif;font-size:.78rem;color:var(--ink-3);line-height:1.5}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <span class="badge">One page · read it before you send anything</span>
+    <h1>What happens to your data</h1>
+    <p class="dek">You're being asked for twelve months of your household's electricity readings. That's a real thing to hand over. Here is exactly what we do with it, and how to make it go away.</p>
+  </header>
+
+  <section>
+    <h2>What we're asking for</h2>
+    <p class="lede">One file: your PG&amp;E usage export, in 15-minute intervals, covering the last 12 months. PG&amp;E calls it <em>Download My Data</em>. Optionally, a production export from your inverter app.</p>
+    <p>That's the whole list. We don't need your bills, your login, your account credentials, or access to anything.</p>
+  </section>
+
+  <div class="file">
+    <div class="file-hd">Before you send it — one thing worth knowing</div>
+    <div class="file-body">
+      <p>The file PG&amp;E generates usually carries a few lines at the top with your <strong>name, service address and account number</strong>, above the actual usage rows.</p>
+      <p class="strip">We don't need any of that. Open the file in any text editor or spreadsheet and delete those top lines before sending — the readings underneath are all we use. If you'd rather not bother, we strip them on arrival and they never reach the analysis.</p>
+      <p>We mention this because most people assume the export is anonymous. It usually isn't, and you should know that before you attach it to an email — to us or to anyone else.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>What we do with it, and what we don't</h2>
+    <div class="two">
+      <div class="col yes">
+        <h3>We do</h3>
+        <ul>
+          <li>Re-price your last 12 months against every PG&amp;E rate plan you're eligible for</li>
+          <li>Measure your always-on load — the power drawn at 3 a.m. when nothing should be running</li>
+          <li>Find large loads running at the wrong hours: pool pump, water heater, EV charging</li>
+          <li>Send you a report with the findings and what each is worth</li>
+        </ul>
+      </div>
+      <div class="col no">
+        <h3>We never</h3>
+        <ul>
+          <li>Sell it, or share it with anyone — no installers, no brokers, no advertisers</li>
+          <li>Use it to build a marketing list or target you with anything</li>
+          <li>Combine it with data brokers' records about you</li>
+          <li>Pass your identity to any contractor, even one we recommend</li>
+        </ul>
+      </div>
+    </div>
+    <p>If a fix needs a contractor, we describe the problem to you. Whether you contact them, and what you tell them, is yours to decide.</p>
+  </section>
+
+  <section>
+    <h2>Where it lives</h2>
+    <ul class="facts">
+      <li><span class="k">Stored on</span><span class="v">One encrypted laptop. Not a cloud service, not a shared drive.</span></li>
+      <li><span class="k">Who can see it</span><span class="v">One person — the same person who replies to your email.</span></li>
+      <li><span class="k">Kept for</span><span class="v">Until your report is delivered, plus 30 days for follow-up questions.</span></li>
+      <li><span class="k">Then</span><span class="v">Deleted, including the original email attachment.</span></li>
+      <li><span class="k">Backups</span><span class="v">None of this data is backed up anywhere.</span></li>
+    </ul>
+  </section>
+
+  <section class="delete">
+    <h2>Deleting it early</h2>
+    <p>Reply to any email from us with the word <span class="mono">delete</span>. Nothing else needed — no form, no reason, no follow-up questions from us.</p>
+    <p>Your file and any analysis of it are gone within 48 hours, and we'll confirm when it's done. You can do this at any point, including after you've had the report.</p>
+    <p>Separately, you can revoke PG&amp;E's side of it any time from your own PG&amp;E account.</p>
+  </section>
+
+  <section>
+    <h2>Being straight about the scale of this</h2>
+    <p>This is an early pilot run by a very small team. A person reads your email and writes your report — there's no platform behind it yet, and we'd rather say so than imply otherwise.</p>
+    <p>The practical upshot: handling is careful but manual, replies take a day or two, and the commitments on this page are the kind one person can actually keep. If this grows into something bigger, these terms get written properly and you'll be told before anything changes.</p>
+  </section>
+
+  <footer>
+    <p>PG&amp;E provides up to 24 months of interval history, and new readings appear about two business days after the fact. We only ask for 12 months because that's what the rate comparison needs.</p>
+    <p>This page describes how we handle your data in this pilot. It isn't a contract, and it doesn't limit any rights you have under California law — including the right to ask what we hold and to have it deleted, which is what the section above is for.</p>
+  </footer>
+
+</div>
+
+</body>
+</html>

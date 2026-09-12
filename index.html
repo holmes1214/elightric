@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="A five-field check on a California rooftop solar + storage system. Runs entirely in your browser.">
+<meta name="robots" content="noindex">
+<style>
+  :root{color-scheme:light dark}
+  body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+</style>
+<title>Rooftop Solar Health Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+</head>
+<body>
+<style>
+/* Saturation encodes certainty: what we know is saturated, what we estimate is flat. */
+:root{
+  --paper:#F2F5F1; --surface:#FFFFFF; --surface-2:#E9EEE8;
+  --ink:#13201A; --ink-2:#3D4E45; --ink-3:#6B7A72;
+  --rule:#D2DBD0; --rule-2:#BFCCBC;
+  --known:#1E6B4A; --known-wash:#E2EFE7;
+  --alert:#A23B1E; --guess:#7C8A82; --guess-wash:#E4E9E3;
+  --band:#2F8A62; --btn-ink:#FFFFFF; --field:#FBFCFA;
+  --shadow:0 1px 2px rgba(19,32,26,.05),0 8px 24px -12px rgba(19,32,26,.18);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0E1512; --surface:#161F1A; --surface-2:#1E2922;
+  --ink:#E8EFE9; --ink-2:#B4C2B8; --ink-3:#87968C;
+  --rule:#2A362F; --rule-2:#3A4941;
+  --known:#5FC896; --known-wash:#17301F;
+  --alert:#E88A67; --guess:#8A9992; --guess-wash:#1C2620;
+  --band:#3FA97A; --btn-ink:#0E1512; --field:#111813;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+}}
+:root[data-theme="dark"]{
+  --paper:#0E1512; --surface:#161F1A; --surface-2:#1E2922;
+  --ink:#E8EFE9; --ink-2:#B4C2B8; --ink-3:#87968C;
+  --rule:#2A362F; --rule-2:#3A4941;
+  --known:#5FC896; --known-wash:#17301F;
+  --alert:#E88A67; --guess:#8A9992; --guess-wash:#1C2620;
+  --band:#3FA97A; --btn-ink:#0E1512; --field:#111813;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:"IBM Plex Serif",Georgia,serif;
+  font-size:16.5px;line-height:1.62;margin:0;-webkit-font-smoothing:antialiased}
+.wrap{max-width:44rem;margin:0 auto;padding:2.5rem 1.25rem 5rem;display:flex;flex-direction:column;gap:2.5rem}
+h1,h2,h3,.ui,label,input,select,button{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+.mast{display:flex;flex-direction:column;gap:.85rem}
+h1{font-size:clamp(1.7rem,5.5vw,2.3rem);line-height:1.15;margin:0;font-weight:600;letter-spacing:-.02em;text-wrap:balance}
+.dek{color:var(--ink-2);margin:0;font-size:1.02rem;max-width:36rem}
+
+/* ── intake ── */
+.intake{background:var(--surface);border:1px solid var(--rule);border-radius:3px;box-shadow:var(--shadow);overflow:hidden}
+.intake-hd{padding:.85rem 1.15rem;border-bottom:1px solid var(--rule);background:var(--surface-2);
+  display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap}
+.intake-hd .ui{font-size:.76rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2)}
+.intake-hd .hint{font-size:.72rem;color:var(--ink-3);font-family:"IBM Plex Mono",monospace}
+.fields{padding:1.15rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:1rem}
+.f{display:flex;flex-direction:column;gap:.32rem}
+.f label{font-size:.79rem;color:var(--ink-2);font-weight:500}
+.f .sub{font-size:.71rem;color:var(--ink-3);font-weight:400}
+.f input,.f select{background:var(--field);color:var(--ink);border:1px solid var(--rule-2);border-radius:2px;
+  padding:.5rem .6rem;font-size:.93rem;width:100%;font-family:"IBM Plex Mono",monospace}
+.f input:focus,.f select:focus{outline:2px solid var(--known);outline-offset:-1px;border-color:transparent}
+.actions{padding:0 1.15rem 1.15rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.btn{font-weight:600;font-size:.95rem;background:var(--known);color:var(--btn-ink);border:0;border-radius:3px;
+  padding:.7rem 1.3rem;cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{filter:brightness(1.08)}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.err{color:var(--alert);font-size:.84rem}
+.ok{color:var(--known);font-size:.84rem;font-weight:600}
+.local{margin:0;padding:0 1.15rem 1.15rem;font-family:"IBM Plex Sans",sans-serif;
+  font-size:.8rem;color:var(--ink-3);line-height:1.5}
+.handoff{background:var(--known-wash);border-radius:2px;padding:.7rem .85rem;margin:0;
+  font-family:"IBM Plex Sans",sans-serif;font-size:.82rem;color:var(--ink-2)}
+
+/* ── report ── */
+.tier{display:flex;flex-direction:column;gap:1rem}
+.tier-hd{display:flex;align-items:baseline;gap:.7rem;flex-wrap:wrap}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:.64rem;letter-spacing:.13em;text-transform:uppercase;
+  padding:.24rem .5rem;border-radius:2px;white-space:nowrap}
+.t-known .tag{background:var(--known-wash);color:var(--known);border:1px solid transparent}
+.t-guess .tag{background:var(--guess-wash);color:var(--guess);border:1px dashed var(--rule-2)}
+.tier-hd h2{font-size:1.06rem;margin:0;font-weight:600;letter-spacing:-.01em}
+.tier-hd .note{font-size:.81rem;color:var(--ink-3);font-family:"IBM Plex Sans",sans-serif}
+.finding{padding-left:1.1rem;border-left:3px solid var(--known)}
+.finding+.finding{margin-top:1.1rem}
+.finding.bad{border-left-color:var(--alert)}
+.finding p{margin:0 0 .5rem}.finding p:last-child{margin-bottom:0}
+.t-guess .finding{border-left:3px dashed var(--rule-2)}
+.prov{font-family:"IBM Plex Sans",sans-serif;font-size:.79rem;color:var(--ink-3);
+  border-top:1px dotted var(--rule-2);padding-top:.5rem;margin-top:.65rem}
+
+.bands{display:flex;flex-direction:column;gap:1.3rem;background:var(--surface);border:1px solid var(--rule);
+  border-radius:3px;padding:1.35rem 1.15rem 1.15rem}
+.band-row{display:flex;flex-direction:column;gap:.42rem}
+.band-lbl{display:flex;justify-content:space-between;align-items:baseline;gap:1rem}
+.band-lbl .n{font-family:"IBM Plex Sans",sans-serif;font-size:.86rem;color:var(--ink-2)}
+.band-lbl .v{font-family:"IBM Plex Mono",monospace;font-size:.88rem;font-weight:500;font-variant-numeric:tabular-nums}
+.track{position:relative;height:.6rem;background:var(--surface-2);border-radius:1px;overflow:hidden}
+.fill{position:absolute;top:0;bottom:0;background:var(--band);opacity:.85;border-radius:1px}
+.fill.faint{opacity:.42}
+.scale{display:flex;justify-content:space-between;font-family:"IBM Plex Mono",monospace;font-size:.66rem;color:var(--ink-3);padding-top:.15rem}
+.bands-foot{font-family:"IBM Plex Sans",sans-serif;font-size:.83rem;color:var(--ink-3);
+  border-top:1px solid var(--rule);padding-top:.85rem;margin:0}
+.items{list-style:none;padding:0;margin:0;display:flex;flex-direction:column}
+.items li{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding:.52rem 0;border-bottom:1px dotted var(--rule)}
+.items li:last-child{border-bottom:0}
+.items .lab{font-family:"IBM Plex Sans",sans-serif;font-size:.9rem}
+.items .amt{font-family:"IBM Plex Mono",monospace;font-size:.86rem;color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.cta{background:var(--surface);border:1px solid var(--known);border-radius:3px;padding:1.45rem 1.3rem;
+  display:flex;flex-direction:column;gap:.9rem;box-shadow:var(--shadow)}
+.cta h2{margin:0;font-size:1.13rem;font-weight:600}
+.cta ul{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.4rem}
+.steps{font-family:"IBM Plex Sans",sans-serif;font-size:.84rem;color:var(--ink-2);margin:0;padding-left:1.1rem;
+  display:flex;flex-direction:column;gap:.28rem}
+.fine{font-family:"IBM Plex Sans",sans-serif;font-size:.8rem;color:var(--ink-3);margin:0}
+footer{border-top:1px solid var(--rule);padding-top:1.2rem;display:flex;flex-direction:column;gap:.5rem}
+footer p{margin:0;font-family:"IBM Plex Sans",sans-serif;font-size:.77rem;color:var(--ink-3)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <h1>A first look at your solar system</h1>
+    <p class="dek">Five things you already know about your system are enough for a first read. We haven't touched any of your usage data — every finding below is labeled with how firmly we actually know it.</p>
+  </header>
+
+  <form class="intake" id="form" autocomplete="off">
+    <div class="intake-hd">
+      <span class="ui">Your system</span>
+      <span class="hint">stays in your browser · nothing is sent</span>
+    </div>
+    <div class="fields">
+      <div class="f">
+        <label for="zip">ZIP code</label>
+        <input id="zip" inputmode="numeric" maxlength="5" value="94402">
+      </div>
+      <div class="f">
+        <label for="year">Installed <span class="sub">— sets your tariff</span></label>
+        <select id="year"></select>
+      </div>
+      <div class="f">
+        <label for="size">System size <span class="sub">— kW, on your inverter app</span></label>
+        <input id="size" inputmode="decimal" value="14.4">
+      </div>
+      <div class="f">
+        <label for="batt">Battery <span class="sub">— kWh, 0 if none</span></label>
+        <input id="batt" inputmode="decimal" value="7">
+      </div>
+      <div class="f" style="grid-column:1/-1">
+        <label for="inst">Who installed it</label>
+        <input id="inst" list="installers" value="Freedom Forever">
+        <datalist id="installers">
+          <option>Sunrun</option><option>Tesla</option><option>SunPower</option>
+          <option>Freedom Forever</option><option>Sunnova</option><option>Vivint Solar</option>
+          <option>Infinity Energy</option><option>PosiGen</option><option>Titan Solar</option>
+          <option>Semper Solaris</option><option>Citadel Roofing and Solar</option>
+        </datalist>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn" type="submit">Show my results</button>
+      <span class="err" id="err"></span>
+      <span class="ok" id="ok" hidden>Updated ↓</span>
+    </div>
+    <p class="local">The numbers below are worked out on your own device. Nothing you type here is uploaded, stored, or sent to us — the fields are pre-filled with an example so you can see how it reads. Change them to yours and the results follow along.</p>
+  </form>
+
+  <div id="out"></div>
+
+  <footer>
+    <p>Tariff rules and bankruptcy dates come from public records: the California Public Utilities Commission's Rule 21 interconnection data (californiadgstats.ca.gov) and public filings.</p>
+    <p>Dollar figures come from an 8,760-hour energy model using published 2026 PG&amp;E rates and NEM 3.0 hourly export values. They are estimates, not a promise of savings.</p>
+    <p id="mailnote"></p>
+  </footer>
+</div>
+
+<script>
+const CONTACT = "etesumotuyep00@gmail.com";   // pilot inbox
+const DATA = {"pv":[3,4,5,6,7,8,10,12,15],"cc":{"SAN FRANCISCO":"coastal","SAN MATEO":"coastal","MARIN":"coastal","SANTA CRUZ":"coastal","MONTEREY":"coastal","SANTA CLARA":"inland","ALAMEDA":"coastal","CONTRA COSTA":"inland","SONOMA":"coastal","NAPA":"inland","SOLANO":"inland","SAN BENITO":"inland","SACRAMENTO":"valley","SAN JOAQUIN":"valley","STANISLAUS":"valley","MERCED":"valley","MADERA":"valley","FRESNO":"valley","KINGS":"valley","TULARE":"valley","KERN":"valley","YOLO":"valley","SUTTER":"valley","YUBA":"valley","COLUSA":"valley","GLENN":"valley","BUTTE":"valley","TEHAMA":"valley","SHASTA":"valley","PLACER":"inland","EL DORADO":"inland","NEVADA":"inland","AMADOR":"inland","CALAVERAS":"inland","TUOLUMNE":"inland","MARIPOSA":"inland","LAKE":"inland","MENDOCINO":"coastal","HUMBOLDT":"coastal","DEL NORTE":"coastal","SAN LUIS OBISPO":"coastal","SANTA BARBARA":"coastal"},"t":{"2.0|0|coastal|3":{"load":[6000,13500],"meter":[100,2400],"telem":[300,300],"comb":[300,2700],"med":{"plan":300,"baseline":900,"pv":300},"batt":null},"2.0|0|coastal|4":{"load":[6000,13500],"meter":[0,2400],"telem":[400,400],"comb":[400,2700],"med":{"plan":300,"baseline":900,"pv":400},"batt":null},"2.0|0|coastal|5":{"load":[6500,14000],"meter":[0,2300],"telem":[200,500],"comb":[200,2700],"med":{"plan":200,"baseline":800,"pv":500},"batt":null},"2.0|0|coastal|6":{"load":[6500,14000],"meter":[0,2200],"telem":[0,500],"comb":[0,2800],"med":{"plan":100,"baseline":600,"pv":500},"batt":null},"2.0|0|coastal|7":{"load":[8000,15500],"meter":[0,2200],"telem":[100,600],"comb":[100,2800],"med":{"baseline":500,"pv":600},"batt":null},"2.0|0|coastal|8":{"load":[9500,17000],"meter":[0,2100],"telem":[100,700],"comb":[100,2900],"med":{"baseline":500,"pv":700},"batt":null},"2.0|0|coastal|10":{"load":[11500,20500],"meter":[0,2100],"telem":[100,900],"comb":[100,3000],"med":{"baseline":500,"pv":900},"batt":null},"2.0|0|coastal|12":{"load":[13000,23500],"meter":[0,2000],"telem":[100,1100],"comb":[100,3100],"med":{"baseline":500,"pv":1100},"batt":null},"2.0|0|coastal|15":{"load":[16500,27500],"meter":[0,1900],"telem":[100,1400],"comb":[100,3300],"med":{"baseline":400,"pv":1200},"batt":null},"2.0|0|inland|3":{"load":[6500,14000],"meter":[100,2500],"telem":[300,300],"comb":[300,2700],"med":{"plan":300,"baseline":900,"pv":300},"batt":null},"2.0|0|inland|4":{"load":[6500,14000],"meter":[0,2400],"telem":[400,400],"comb":[400,2700],"med":{"plan":300,"baseline":900,"pv":400},"batt":null},"2.0|0|inland|5":{"load":[7000,14000],"meter":[0,2300],"telem":[400,500],"comb":[400,2700],"med":{"plan":200,"baseline":900,"pv":500},"batt":null},"2.0|0|inland|6":{"load":[7000,14500],"meter":[0,2200],"telem":[0,500],"comb":[0,2700],"med":{"plan":100,"baseline":700,"pv":500},"batt":null},"2.0|0|inland|7":{"load":[8000,15500],"meter":[0,2100],"telem":[100,600],"comb":[100,2800],"med":{"baseline":500,"pv":600},"batt":null},"2.0|0|inland|8":{"load":[9500,17500],"meter":[0,2100],"telem":[100,700],"comb":[100,2800],"med":{"baseline":500,"pv":700},"batt":null},"2.0|0|inland|10":{"load":[11500,21000],"meter":[0,2000],"telem":[100,900],"comb":[100,2900],"med":{"baseline":500,"pv":900},"batt":null},"2.0|0|inland|12":{"load":[13500,24500],"meter":[0,2000],"telem":[100,1100],"comb":[100,3000],"med":{"baseline":600,"pv":1100},"batt":null},"2.0|0|inland|15":{"load":[16500,29000],"meter":[0,1900],"telem":[100,1400],"comb":[100,3200],"med":{"baseline":600,"pv":1300},"batt":null},"2.0|0|valley|3":{"load":[7000,14500],"meter":[100,2500],"telem":[300,300],"comb":[300,2700],"med":{"plan":300,"baseline":900,"pv":300},"batt":null},"2.0|0|valley|4":{"load":[7000,14500],"meter":[0,2400],"telem":[400,400],"comb":[400,2700],"med":{"plan":300,"baseline":900,"pv":400},"batt":null},"2.0|0|valley|5":{"load":[7500,14500],"meter":[0,2300],"telem":[500,500],"comb":[500,2700],"med":{"plan":200,"baseline":900,"pv":500},"batt":null},"2.0|0|valley|6":{"load":[7500,15000],"meter":[0,2200],"telem":[200,500],"comb":[200,2700],"med":{"plan":100,"baseline":800,"pv":500},"batt":null},"2.0|0|valley|7":{"load":[8000,15500],"meter":[0,2100],"telem":[100,600],"comb":[100,2800],"med":{"baseline":600,"pv":600},"batt":null},"2.0|0|valley|8":{"load":[9500,17500],"meter":[0,2100],"telem":[100,700],"comb":[100,2800],"med":{"baseline":500,"pv":700},"batt":null},"2.0|0|valley|10":{"load":[12000,21000],"meter":[0,2000],"telem":[100,900],"comb":[100,2900],"med":{"baseline":600,"pv":900},"batt":null},"2.0|0|valley|12":{"load":[13500,24500],"meter":[0,1900],"telem":[100,1100],"comb":[100,3000],"med":{"baseline":600,"pv":1100},"batt":null},"2.0|0|valley|15":{"load":[16500,29000],"meter":[0,1800],"telem":[100,1400],"comb":[100,3200],"med":{"baseline":600,"pv":1400},"batt":null},"2.0|1|coastal|3":{"load":[6000,13500],"meter":[300,2300],"telem":[300,500],"comb":[800,2600],"med":{"plan":400,"baseline":800,"shift":100,"pv":200,"batt":200},"batt":[100,300]},"2.0|1|coastal|4":{"load":[6000,13500],"meter":[200,2400],"telem":[500,800],"comb":[1000,2900],"med":{"plan":400,"baseline":800,"shift":100,"pv":300,"batt":400},"batt":[200,500]},"2.0|1|coastal|5":{"load":[6500,14000],"meter":[200,2400],"telem":[700,1000],"comb":[1000,3100],"med":{"plan":300,"baseline":800,"shift":100,"pv":400,"batt":400},"batt":[400,500]},"2.0|1|coastal|6":{"load":[6500,14000],"meter":[100,2300],"telem":[600,1100],"comb":[700,3300],"med":{"plan":300,"baseline":600,"shift":100,"pv":500,"batt":500},"batt":[400,600]},"2.0|1|coastal|7":{"load":[8000,15500],"meter":[100,2300],"telem":[600,1200],"comb":[700,3300],"med":{"plan":200,"baseline":500,"shift":100,"pv":600,"batt":500},"batt":[500,600]},"2.0|1|coastal|8":{"load":[9500,17000],"meter":[100,2300],"telem":[600,1300],"comb":[700,3400],"med":{"plan":200,"baseline":500,"pv":700,"batt":500},"batt":[500,600]},"2.0|1|coastal|10":{"load":[11500,20500],"meter":[0,2200],"telem":[700,1500],"comb":[700,3600],"med":{"plan":200,"baseline":500,"pv":900,"batt":600},"batt":[500,600]},"2.0|1|coastal|12":{"load":[13000,23500],"meter":[0,2200],"telem":[700,1700],"comb":[700,3800],"med":{"plan":200,"baseline":500,"pv":1100,"batt":600},"batt":[500,600]},"2.0|1|coastal|15":{"load":[16500,27500],"meter":[0,2100],"telem":[700,1900],"comb":[700,4100],"med":{"plan":100,"baseline":400,"pv":1200,"batt":600},"batt":[600,600]},"2.0|1|inland|3":{"load":[6500,14000],"meter":[300,2300],"telem":[300,500],"comb":[700,2600],"med":{"plan":400,"baseline":800,"shift":100,"pv":200,"batt":200},"batt":[100,300]},"2.0|1|inland|4":{"load":[6500,14000],"meter":[200,2400],"telem":[500,700],"comb":[1000,2800],"med":{"plan":400,"baseline":800,"shift":100,"pv":300,"batt":300},"batt":[200,400]},"2.0|1|inland|5":{"load":[7000,14000],"meter":[200,2400],"telem":[700,900],"comb":[1100,3100],"med":{"plan":300,"baseline":800,"shift":100,"pv":400,"batt":400},"batt":[400,500]},"2.0|1|inland|6":{"load":[7000,14500],"meter":[100,2300],"telem":[600,1100],"comb":[700,3200],"med":{"plan":300,"baseline":700,"shift":100,"pv":500,"batt":500},"batt":[400,600]},"2.0|1|inland|7":{"load":[8000,15500],"meter":[100,2300],"telem":[600,1200],"comb":[700,3300],"med":{"plan":200,"baseline":500,"shift":100,"pv":600,"batt":500},"batt":[500,600]},"2.0|1|inland|8":{"load":[9500,17500],"meter":[100,2200],"telem":[700,1300],"comb":[700,3400],"med":{"plan":200,"baseline":500,"pv":700,"batt":500},"batt":[500,600]},"2.0|1|inland|10":{"load":[11500,21000],"meter":[0,2200],"telem":[700,1500],"comb":[700,3600],"med":{"plan":100,"baseline":500,"pv":900,"batt":600},"batt":[500,600]},"2.0|1|inland|12":{"load":[13500,24500],"meter":[0,2100],"telem":[700,1700],"comb":[700,3800],"med":{"plan":100,"baseline":600,"pv":1100,"batt":600},"batt":[600,600]},"2.0|1|inland|15":{"load":[16500,29000],"meter":[0,2100],"telem":[700,2000],"comb":[700,4000],"med":{"baseline":600,"pv":1300,"batt":600},"batt":[600,600]},"2.0|1|valley|3":{"load":[7000,14500],"meter":[200,2300],"telem":[300,500],"comb":[700,2600],"med":{"plan":400,"baseline":800,"shift":100,"pv":200,"batt":200},"batt":[100,300]},"2.0|1|valley|4":{"load":[7000,14500],"meter":[200,2400],"telem":[500,700],"comb":[900,2800],"med":{"plan":400,"baseline":800,"shift":100,"pv":300,"batt":300},"batt":[200,400]},"2.0|1|valley|5":{"load":[7500,14500],"meter":[200,2400],"telem":[700,900],"comb":[1100,3100],"med":{"plan":300,"baseline":800,"shift":100,"pv":400,"batt":400},"batt":[300,500]},"2.0|1|valley|6":{"load":[7500,15000],"meter":[100,2300],"telem":[700,1100],"comb":[800,3200],"med":{"plan":300,"baseline":800,"shift":100,"pv":500,"batt":500},"batt":[400,600]},"2.0|1|valley|7":{"load":[8000,15500],"meter":[100,2200],"telem":[600,1200],"comb":[700,3300],"med":{"plan":200,"baseline":500,"shift":100,"pv":600,"batt":500},"batt":[500,600]},"2.0|1|valley|8":{"load":[9500,17500],"meter":[100,2200],"telem":[700,1300],"comb":[800,3400],"med":{"plan":200,"baseline":500,"pv":700,"batt":500},"batt":[500,600]},"2.0|1|valley|10":{"load":[12000,21000],"meter":[0,2200],"telem":[700,1500],"comb":[700,3600],"med":{"plan":100,"baseline":500,"pv":900,"batt":600},"batt":[500,600]},"2.0|1|valley|12":{"load":[13500,24500],"meter":[0,2100],"telem":[700,1700],"comb":[700,3800],"med":{"baseline":600,"pv":1100,"batt":600},"batt":[600,600]},"2.0|1|valley|15":{"load":[16500,29000],"meter":[0,2000],"telem":[700,2000],"comb":[700,4000],"med":{"baseline":600,"pv":1400,"batt":600},"batt":[600,600]},"3.0|0|coastal|3":{"load":[6000,13500],"meter":[400,2200],"telem":[100,100],"comb":[500,2400],"med":{"plan":400,"baseline":700,"shift":200,"pv":100},"batt":null},"3.0|0|coastal|4":{"load":[6000,13500],"meter":[500,2300],"telem":[100,100],"comb":[500,2400],"med":{"plan":400,"baseline":700,"shift":300,"pv":100},"batt":null},"3.0|0|coastal|5":{"load":[6500,14000],"meter":[600,2300],"telem":[100,100],"comb":[700,2400],"med":{"plan":400,"baseline":700,"shift":400,"pv":100},"batt":null},"3.0|0|coastal|6":{"load":[6500,14000],"meter":[700,2400],"telem":[100,100],"comb":[800,2500],"med":{"plan":400,"baseline":600,"shift":500,"pv":100},"batt":null},"3.0|0|coastal|7":{"load":[8000,15500],"meter":[700,2500],"telem":[100,100],"comb":[900,2600],"med":{"plan":400,"baseline":600,"shift":500,"pv":100},"batt":null},"3.0|0|coastal|8":{"load":[9500,17000],"meter":[900,2700],"telem":[100,200],"comb":[1100,2900],"med":{"plan":500,"baseline":600,"shift":700,"pv":100},"batt":null},"3.0|0|coastal|10":{"load":[11500,20500],"meter":[1200,3300],"telem":[200,200],"comb":[1400,3400],"med":{"plan":600,"baseline":600,"shift":1000,"pv":200},"batt":null},"3.0|0|coastal|12":{"load":[13000,23500],"meter":[1600,3800],"telem":[200,200],"comb":[1800,4000],"med":{"plan":700,"baseline":600,"shift":1300,"pv":200},"batt":null},"3.0|0|coastal|15":{"load":[16500,27500],"meter":[2000,4500],"telem":[200,300],"comb":[2300,4700],"med":{"plan":800,"baseline":600,"shift":1700,"pv":300},"batt":null},"3.0|0|inland|3":{"load":[6500,14000],"meter":[400,2300],"telem":[100,100],"comb":[500,2400],"med":{"plan":400,"baseline":700,"shift":100,"pv":100},"batt":null},"3.0|0|inland|4":{"load":[6500,14000],"meter":[400,2200],"telem":[100,100],"comb":[500,2400],"med":{"plan":400,"baseline":700,"shift":200,"pv":100},"batt":null},"3.0|0|inland|5":{"load":[7000,14000],"meter":[500,2300],"telem":[100,100],"comb":[600,2400],"med":{"plan":400,"baseline":700,"shift":300,"pv":100},"batt":null},"3.0|0|inland|6":{"load":[7000,14500],"meter":[600,2400],"telem":[100,100],"comb":[800,2500],"med":{"plan":400,"baseline":600,"shift":400,"pv":100},"batt":null},"3.0|0|inland|7":{"load":[8000,15500],"meter":[700,2400],"telem":[100,200],"comb":[900,2600],"med":{"plan":400,"baseline":600,"shift":500,"pv":100},"batt":null},"3.0|0|inland|8":{"load":[9500,17500],"meter":[800,2600],"telem":[100,200],"comb":[1000,2800],"med":{"plan":500,"baseline":600,"shift":600,"pv":200},"batt":null},"3.0|0|inland|10":{"load":[11500,21000],"meter":[1100,3100],"telem":[200,200],"comb":[1300,3200],"med":{"plan":500,"baseline":600,"shift":900,"pv":200},"batt":null},"3.0|0|inland|12":{"load":[13500,24500],"meter":[1400,3500],"telem":[200,300],"comb":[1600,3700],"med":{"plan":600,"baseline":600,"shift":1100,"pv":200},"batt":null},"3.0|0|inland|15":{"load":[16500,29000],"meter":[1700,4100],"telem":[300,300],"comb":[2000,4400],"med":{"plan":700,"baseline":600,"shift":1500,"pv":300},"batt":null},"3.0|0|valley|3":{"load":[7000,14500],"meter":[400,2300],"telem":[100,100],"comb":[400,2400],"med":{"plan":400,"baseline":800,"shift":100,"pv":100},"batt":null},"3.0|0|valley|4":{"load":[7000,14500],"meter":[400,2200],"telem":[100,100],"comb":[500,2400],"med":{"plan":400,"baseline":700,"shift":200,"pv":100},"batt":null},"3.0|0|valley|5":{"load":[7500,14500],"meter":[500,2300],"telem":[100,100],"comb":[600,2400],"med":{"plan":400,"baseline":700,"shift":300,"pv":100},"batt":null},"3.0|0|valley|6":{"load":[7500,15000],"meter":[600,2300],"telem":[100,200],"comb":[700,2500],"med":{"plan":400,"baseline":600,"shift":400,"pv":100},"batt":null},"3.0|0|valley|7":{"load":[8000,15500],"meter":[700,2400],"telem":[100,200],"comb":[900,2500],"med":{"plan":400,"baseline":600,"shift":500,"pv":100},"batt":null},"3.0|0|valley|8":{"load":[9500,17500],"meter":[800,2600],"telem":[100,200],"comb":[900,2700],"med":{"plan":400,"baseline":600,"shift":600,"pv":200},"batt":null},"3.0|0|valley|10":{"load":[12000,21000],"meter":[1000,2900],"telem":[200,200],"comb":[1200,3100],"med":{"plan":500,"baseline":600,"shift":800,"pv":200},"batt":null},"3.0|0|valley|12":{"load":[13500,24500],"meter":[1200,3300],"telem":[200,300],"comb":[1500,3600],"med":{"plan":600,"baseline":600,"shift":1000,"pv":200},"batt":null},"3.0|0|valley|15":{"load":[16500,29000],"meter":[1600,3900],"telem":[300,400],"comb":[1900,4200],"med":{"plan":600,"baseline":600,"shift":1400,"pv":300},"batt":null},"3.0|1|coastal|3":{"load":[6000,13500],"meter":[300,2300],"telem":[100,200],"comb":[400,2500],"med":{"plan":400,"baseline":800,"shift":100,"pv":200},"batt":[0,0]},"3.0|1|coastal|4":{"load":[6000,13500],"meter":[300,2200],"telem":[100,200],"comb":[400,2400],"med":{"plan":400,"baseline":700,"shift":200,"pv":100},"batt":[0,0]},"3.0|1|coastal|5":{"load":[6500,14000],"meter":[500,2200],"telem":[100,200],"comb":[600,2400],"med":{"plan":400,"baseline":700,"shift":300,"pv":100},"batt":[0,0]},"3.0|1|coastal|6":{"load":[6500,14000],"meter":[600,2300],"telem":[100,200],"comb":[700,2400],"med":{"plan":400,"baseline":600,"shift":400,"pv":100},"batt":[0,0]},"3.0|1|coastal|7":{"load":[8000,15500],"meter":[600,2400],"telem":[100,200],"comb":[800,2600],"med":{"plan":400,"baseline":600,"shift":500,"pv":200},"batt":[0,0]},"3.0|1|coastal|8":{"load":[9500,17000],"meter":[800,2700],"telem":[100,200],"comb":[1000,2800],"med":{"plan":500,"baseline":600,"shift":600,"pv":200},"batt":[0,0]},"3.0|1|coastal|10":{"load":[11500,20500],"meter":[1200,3100],"telem":[200,200],"comb":[1400,3300],"med":{"plan":600,"baseline":600,"shift":900,"pv":200},"batt":[0,0]},"3.0|1|coastal|12":{"load":[13000,23500],"meter":[1500,3600],"telem":[200,300],"comb":[1700,3900],"med":{"plan":600,"baseline":600,"shift":1300,"pv":200},"batt":[0,0]},"3.0|1|coastal|15":{"load":[16500,27500],"meter":[2000,4400],"telem":[200,300],"comb":[2300,4600],"med":{"plan":800,"baseline":600,"shift":1700,"pv":300},"batt":[0,0]},"3.0|1|inland|3":{"load":[6500,14000],"meter":[300,2300],"telem":[100,200],"comb":[400,2600],"med":{"plan":400,"baseline":800,"shift":100,"pv":200},"batt":[0,0]},"3.0|1|inland|4":{"load":[6500,14000],"meter":[300,2200],"telem":[100,200],"comb":[400,2500],"med":{"plan":400,"baseline":800,"shift":100,"pv":200},"batt":[0,0]},"3.0|1|inland|5":{"load":[7000,14000],"meter":[400,2200],"telem":[100,200],"comb":[500,2400],"med":{"plan":400,"baseline":700,"shift":200,"pv":200},"batt":[0,0]},"3.0|1|inland|6":{"load":[7000,14500],"meter":[500,2300],"telem":[100,200],"comb":[700,2400],"med":{"plan":400,"baseline":700,"shift":400,"pv":200},"batt":[0,0]},"3.0|1|inland|7":{"load":[8000,15500],"meter":[600,2400],"telem":[100,200],"comb":[800,2500],"med":{"plan":400,"baseline":600,"shift":500,"pv":200},"batt":[0,0]},"3.0|1|inland|8":{"load":[9500,17500],"meter":[700,2500],"telem":[100,200],"comb":[900,2700],"med":{"plan":400,"baseline":600,"shift":600,"pv":200},"batt":[0,0]},"3.0|1|inland|10":{"load":[11500,21000],"meter":[1000,2900],"telem":[200,300],"comb":[1200,3100],"med":{"plan":500,"baseline":600,"shift":800,"pv":200},"batt":[0,0]},"3.0|1|inland|12":{"load":[13500,24500],"meter":[1300,3400],"telem":[200,300],"comb":[1500,3600],"med":{"plan":600,"baseline":600,"shift":1100,"pv":200},"batt":[0,0]},"3.0|1|inland|15":{"load":[16500,29000],"meter":[1700,4000],"telem":[300,400],"comb":[2000,4300],"med":{"plan":700,"baseline":600,"shift":1500,"pv":300},"batt":[0,0]},"3.0|1|valley|3":{"load":[7000,14500],"meter":[300,2300],"telem":[200,200],"comb":[400,2600],"med":{"plan":400,"baseline":800,"shift":100,"pv":200},"batt":[0,0]},"3.0|1|valley|4":{"load":[7000,14500],"meter":[300,2300],"telem":[100,200],"comb":[400,2500],"med":{"plan":400,"baseline":800,"shift":100,"pv":200},"batt":[0,0]},"3.0|1|valley|5":{"load":[7500,14500],"meter":[400,2200],"telem":[100,200],"comb":[500,2400],"med":{"plan":400,"baseline":700,"shift":200,"pv":200},"batt":[0,0]},"3.0|1|valley|6":{"load":[7500,15000],"meter":[500,2200],"telem":[100,200],"comb":[600,2400],"med":{"plan":400,"baseline":700,"shift":300,"pv":200},"batt":[0,0]},"3.0|1|valley|7":{"load":[8000,15500],"meter":[600,2300],"telem":[100,200],"comb":[700,2500],"med":{"plan":400,"baseline":600,"shift":400,"pv":200},"batt":[0,0]},"3.0|1|valley|8":{"load":[9500,17500],"meter":[700,2500],"telem":[100,200],"comb":[800,2700],"med":{"plan":400,"baseline":600,"shift":500,"pv":200},"batt":[0,0]},"3.0|1|valley|10":{"load":[12000,21000],"meter":[1000,2800],"telem":[200,300],"comb":[1200,3000],"med":{"plan":500,"baseline":600,"shift":800,"pv":200},"batt":[0,0]},"3.0|1|valley|12":{"load":[13500,24500],"meter":[1200,3200],"telem":[200,300],"comb":[1400,3500],"med":{"plan":500,"baseline":600,"shift":1000,"pv":300},"batt":[0,0]},"3.0|1|valley|15":{"load":[16500,29000],"meter":[1500,3800],"telem":[300,400],"comb":[1800,4100],"med":{"plan":600,"baseline":600,"shift":1400,"pv":300},"batt":[0,0]}}};
+const ZIPC = {"93201":"TULARE","93203":"KERN","93204":"KINGS","93206":"KERN","93210":"FRESNO","93212":"KINGS","93219":"TULARE","93224":"KERN","93230":"KINGS","93234":"FRESNO","93239":"KINGS","93241":"KERN","93242":"FRESNO","93243":"KERN","93244":"TULARE","93245":"KINGS","93249":"KERN","93250":"KERN","93251":"KERN","93252":"KERN","93254":"SANTA BARBARA","93262":"KERN","93263":"KERN","93266":"KINGS","93268":"KERN","93272":"TULARE","93274":"TULARE","93276":"KERN","93280":"KERN","93282":"TULARE","93286":"TULARE","93291":"TULARE","93292":"TULARE","93301":"KERN","93303":"KERN","93304":"KERN","93305":"KERN","93306":"KERN","93307":"KERN","93308":"KERN","93309":"KERN","93311":"KERN","93312":"KERN","93313":"KERN","93314":"KERN","93380":"KERN","93390":"KERN","93401":"SAN LUIS OBISPO","93402":"SAN LUIS OBISPO","93405":"SAN LUIS OBISPO","93408":"SAN LUIS OBISPO","93420":"SAN LUIS OBISPO","93421":"SAN LUIS OBISPO","93422":"SAN LUIS OBISPO","93424":"SAN LUIS OBISPO","93426":"SAN LUIS OBISPO","93427":"SANTA BARBARA","93428":"SAN LUIS OBISPO","93429":"SANTA BARBARA","93430":"SAN LUIS OBISPO","93432":"SAN LUIS OBISPO","93433":"SAN LUIS OBISPO","93434":"SANTA BARBARA","93435":"SAN LUIS OBISPO","93436":"SANTA BARBARA","93440":"SANTA BARBARA","93441":"SANTA BARBARA","93442":"SAN LUIS OBISPO","93444":"SAN LUIS OBISPO","93445":"SAN LUIS OBISPO","93446":"SAN LUIS OBISPO","93447":"SAN LUIS OBISPO","93449":"SAN LUIS OBISPO","93450":"MONTEREY","93451":"SAN LUIS OBISPO","93452":"SAN LUIS OBISPO","93453":"SAN LUIS OBISPO","93454":"SANTA BARBARA","93455":"SANTA BARBARA","93456":"SANTA BARBARA","93458":"SANTA BARBARA","93460":"SANTA BARBARA","93461":"SAN LUIS OBISPO","93463":"SANTA BARBARA","93465":"SAN LUIS OBISPO","93601":"MADERA","93602":"FRESNO","93603":"TULARE","93604":"MADERA","93606":"FRESNO","93607":"FRESNO","93608":"FRESNO","93609":"FRESNO","93610":"MADERA","93611":"FRESNO","93612":"FRESNO","93614":"MADERA","93615":"TULARE","93616":"FRESNO","93618":"TULARE","93619":"FRESNO","93620":"MERCED","93621":"FRESNO","93622":"FRESNO","93624":"FRESNO","93625":"FRESNO","93626":"FRESNO","93627":"FRESNO","93628":"FRESNO","93630":"FRESNO","93631":"FRESNO","93633":"FRESNO","93635":"MERCED","93636":"MADERA","93637":"MADERA","93638":"MADERA","93639":"MADERA","93640":"FRESNO","93641":"FRESNO","93643":"MADERA","93644":"MADERA","93645":"MADERA","93646":"FRESNO","93647":"TULARE","93648":"FRESNO","93650":"FRESNO","93651":"FRESNO","93652":"FRESNO","93653":"MADERA","93654":"FRESNO","93656":"FRESNO","93657":"FRESNO","93660":"FRESNO","93662":"FRESNO","93664":"FRESNO","93665":"MERCED","93666":"TULARE","93667":"FRESNO","93668":"FRESNO","93669":"MADERA","93670":"TULARE","93673":"TULARE","93675":"FRESNO","93701":"FRESNO","93702":"FRESNO","93703":"FRESNO","93704":"FRESNO","93705":"FRESNO","93706":"FRESNO","93710":"FRESNO","93711":"FRESNO","93720":"FRESNO","93721":"FRESNO","93722":"FRESNO","93723":"FRESNO","93725":"FRESNO","93726":"FRESNO","93727":"FRESNO","93728":"FRESNO","93730":"FRESNO","93737":"FRESNO","93793":"FRESNO","93901":"MONTEREY","93905":"MONTEREY","93906":"MONTEREY","93907":"MONTEREY","93908":"MONTEREY","93920":"MONTEREY","93921":"MONTEREY","93923":"MONTEREY","93924":"MONTEREY","93925":"MONTEREY","93926":"MONTEREY","93927":"MONTEREY","93928":"MONTEREY","93930":"MONTEREY","93932":"MONTEREY","93933":"MONTEREY","93940":"MONTEREY","93950":"MONTEREY","93953":"MONTEREY","93954":"MONTEREY","93955":"MONTEREY","93960":"MONTEREY","93962":"MONTEREY","94002":"SAN MATEO","94005":"SAN MATEO","94010":"SAN MATEO","94014":"SAN MATEO","94015":"SAN MATEO","94018":"SAN MATEO","94019":"SAN MATEO","94020":"SAN MATEO","94021":"SAN MATEO","94022":"SANTA CLARA","94024":"SANTA CLARA","94025":"SAN MATEO","94027":"SAN MATEO","94028":"SAN MATEO","94030":"SAN MATEO","94037":"SAN MATEO","94038":"SAN MATEO","94040":"SANTA CLARA","94041":"SANTA CLARA","94043":"SANTA CLARA","94044":"SAN MATEO","94060":"SAN MATEO","94061":"SAN MATEO","94062":"SAN MATEO","94063":"SAN MATEO","94065":"SAN MATEO","94066":"SAN MATEO","94070":"SAN MATEO","94074":"SAN MATEO","94080":"SAN MATEO","94085":"SANTA CLARA","94086":"SANTA CLARA","94087":"SANTA CLARA","94089":"SANTA CLARA","94102":"SAN FRANCISCO","94103":"SAN FRANCISCO","94107":"SAN FRANCISCO","94108":"SAN FRANCISCO","94109":"SAN FRANCISCO","94110":"SAN FRANCISCO","94111":"SAN FRANCISCO","94112":"SAN FRANCISCO","94114":"SAN FRANCISCO","94115":"SAN FRANCISCO","94116":"SAN FRANCISCO","94117":"SAN FRANCISCO","94118":"SAN FRANCISCO","94121":"SAN FRANCISCO","94122":"SAN FRANCISCO","94123":"SAN FRANCISCO","94124":"SAN FRANCISCO","94127":"SAN FRANCISCO","94131":"SAN FRANCISCO","94132":"SAN FRANCISCO","94133":"SAN FRANCISCO","94134":"SAN FRANCISCO","94158":"SAN FRANCISCO","94303":"SAN MATEO","94304":"SANTA CLARA","94305":"SANTA CLARA","94401":"SAN MATEO","94402":"SAN MATEO","94403":"SAN MATEO","94404":"SAN MATEO","94503":"NAPA","94505":"CONTRA COSTA","94506":"CONTRA COSTA","94507":"CONTRA COSTA","94508":"NAPA","94509":"CONTRA COSTA","94510":"SOLANO","94511":"CONTRA COSTA","94513":"CONTRA COSTA","94514":"CONTRA COSTA","94515":"NAPA","94516":"CONTRA COSTA","94517":"CONTRA COSTA","94518":"CONTRA COSTA","94519":"CONTRA COSTA","94520":"CONTRA COSTA","94521":"CONTRA COSTA","94523":"CONTRA COSTA","94525":"CONTRA COSTA","94526":"CONTRA COSTA","94528":"CONTRA COSTA","94530":"CONTRA COSTA","94531":"CONTRA COSTA","94533":"SOLANO","94534":"SOLANO","94535":"SOLANO","94536":"ALAMEDA","94537":"ALAMEDA","94538":"ALAMEDA","94539":"ALAMEDA","94541":"ALAMEDA","94542":"ALAMEDA","94544":"ALAMEDA","94545":"ALAMEDA","94546":"ALAMEDA","94547":"CONTRA COSTA","94548":"CONTRA COSTA","94549":"CONTRA COSTA","94550":"ALAMEDA","94551":"ALAMEDA","94552":"ALAMEDA","94553":"CONTRA COSTA","94555":"ALAMEDA","94556":"CONTRA COSTA","94558":"NAPA","94559":"NAPA","94560":"ALAMEDA","94561":"CONTRA COSTA","94562":"NAPA","94563":"CONTRA COSTA","94564":"CONTRA COSTA","94565":"CONTRA COSTA","94566":"ALAMEDA","94567":"NAPA","94568":"ALAMEDA","94569":"CONTRA COSTA","94571":"SOLANO","94572":"CONTRA COSTA","94573":"NAPA","94574":"NAPA","94576":"NAPA","94577":"ALAMEDA","94578":"ALAMEDA","94579":"ALAMEDA","94580":"ALAMEDA","94582":"CONTRA COSTA","94583":"CONTRA COSTA","94585":"SOLANO","94586":"ALAMEDA","94587":"ALAMEDA","94588":"ALAMEDA","94589":"SOLANO","94590":"SOLANO","94591":"SOLANO","94595":"CONTRA COSTA","94596":"CONTRA COSTA","94597":"CONTRA COSTA","94598":"CONTRA COSTA","94599":"NAPA","94601":"ALAMEDA","94602":"ALAMEDA","94603":"ALAMEDA","94605":"ALAMEDA","94606":"ALAMEDA","94607":"ALAMEDA","94608":"ALAMEDA","94609":"ALAMEDA","94610":"ALAMEDA","94611":"ALAMEDA","94612":"ALAMEDA","94618":"ALAMEDA","94619":"ALAMEDA","94621":"ALAMEDA","94702":"ALAMEDA","94703":"ALAMEDA","94704":"ALAMEDA","94705":"ALAMEDA","94706":"ALAMEDA","94707":"ALAMEDA","94708":"ALAMEDA","94709":"ALAMEDA","94710":"ALAMEDA","94720":"ALAMEDA","94801":"CONTRA COSTA","94803":"CONTRA COSTA","94804":"CONTRA COSTA","94805":"CONTRA COSTA","94806":"CONTRA COSTA","94901":"MARIN","94903":"MARIN","94904":"MARIN","94920":"MARIN","94922":"SONOMA","94923":"SONOMA","94924":"MARIN","94925":"MARIN","94928":"SONOMA","94929":"MARIN","94930":"MARIN","94931":"SONOMA","94933":"MARIN","94937":"MARIN","94938":"MARIN","94939":"MARIN","94940":"MARIN","94941":"MARIN","94945":"MARIN","94946":"MARIN","94947":"MARIN","94949":"MARIN","94950":"MARIN","94951":"SONOMA","94952":"SONOMA","94954":"SONOMA","94956":"MARIN","94957":"MARIN","94960":"MARIN","94963":"MARIN","94964":"MARIN","94965":"MARIN","94970":"MARIN","94971":"MARIN","94972":"SONOMA","94973":"MARIN","95001":"SANTA CRUZ","95002":"SANTA CLARA","95003":"SANTA CRUZ","95004":"MONTEREY","95005":"SANTA CRUZ","95006":"SANTA CRUZ","95007":"SANTA CRUZ","95008":"SANTA CLARA","95010":"SANTA CRUZ","95012":"MONTEREY","95013":"SANTA CLARA","95014":"SANTA CLARA","95017":"SANTA CRUZ","95018":"SANTA CRUZ","95019":"SANTA CRUZ","95020":"SANTA CLARA","95023":"SAN BENITO","95024":"SAN BENITO","95030":"SANTA CLARA","95031":"SANTA CLARA","95032":"SANTA CLARA","95033":"SANTA CLARA","95035":"SANTA CLARA","95037":"SANTA CLARA","95039":"MONTEREY","95041":"SANTA CRUZ","95043":"SAN BENITO","95044":"SANTA CLARA","95045":"SAN BENITO","95046":"SANTA CLARA","95050":"SANTA CLARA","95060":"SANTA CRUZ","95062":"SANTA CRUZ","95064":"SANTA CRUZ","95065":"SANTA CRUZ","95066":"SANTA CRUZ","95070":"SANTA CLARA","95073":"SANTA CRUZ","95075":"SAN BENITO","95076":"SANTA CRUZ","95110":"SANTA CLARA","95111":"SANTA CLARA","95112":"SANTA CLARA","95113":"SANTA CLARA","95116":"SANTA CLARA","95117":"SANTA CLARA","95118":"SANTA CLARA","95119":"SANTA CLARA","95120":"SANTA CLARA","95121":"SANTA CLARA","95122":"SANTA CLARA","95123":"SANTA CLARA","95124":"SANTA CLARA","95125":"SANTA CLARA","95126":"SANTA CLARA","95127":"SANTA CLARA","95128":"SANTA CLARA","95129":"SANTA CLARA","95130":"SANTA CLARA","95131":"SANTA CLARA","95132":"SANTA CLARA","95133":"SANTA CLARA","95134":"SANTA CLARA","95135":"SANTA CLARA","95136":"SANTA CLARA","95138":"SANTA CLARA","95139":"SANTA CLARA","95140":"SANTA CLARA","95141":"SANTA CLARA","95148":"SANTA CLARA","95202":"SAN JOAQUIN","95203":"SAN JOAQUIN","95204":"SAN JOAQUIN","95205":"SAN JOAQUIN","95206":"SAN JOAQUIN","95207":"SAN JOAQUIN","95209":"SAN JOAQUIN","95210":"SAN JOAQUIN","95211":"SAN JOAQUIN","95212":"SAN JOAQUIN","95215":"SAN JOAQUIN","95219":"SAN JOAQUIN","95220":"SAN JOAQUIN","95221":"CALAVERAS","95222":"CALAVERAS","95223":"CALAVERAS","95224":"CALAVERAS","95225":"CALAVERAS","95226":"CALAVERAS","95227":"SAN JOAQUIN","95228":"CALAVERAS","95229":"CALAVERAS","95230":"SAN JOAQUIN","95231":"SAN JOAQUIN","95232":"CALAVERAS","95233":"CALAVERAS","95236":"SAN JOAQUIN","95237":"SAN JOAQUIN","95240":"SAN JOAQUIN","95242":"SAN JOAQUIN","95245":"CALAVERAS","95246":"CALAVERAS","95247":"CALAVERAS","95248":"CALAVERAS","95249":"CALAVERAS","95250":"SAN JOAQUIN","95251":"CALAVERAS","95252":"CALAVERAS","95253":"SAN JOAQUIN","95254":"CALAVERAS","95255":"CALAVERAS","95257":"CALAVERAS","95258":"SAN JOAQUIN","95301":"MERCED","95303":"MERCED","95304":"SAN JOAQUIN","95306":"MARIPOSA","95309":"TUOLUMNE","95310":"TUOLUMNE","95311":"MARIPOSA","95312":"MERCED","95313":"STANISLAUS","95317":"MERCED","95318":"MARIPOSA","95320":"SAN JOAQUIN","95321":"TUOLUMNE","95322":"MERCED","95325":"MARIPOSA","95327":"TUOLUMNE","95329":"MARIPOSA","95330":"SAN JOAQUIN","95333":"MERCED","95334":"MERCED","95335":"TUOLUMNE","95336":"SAN JOAQUIN","95337":"SAN JOAQUIN","95338":"MARIPOSA","95340":"MERCED","95341":"MERCED","95345":"MARIPOSA","95346":"TUOLUMNE","95348":"MERCED","95357":"STANISLAUS","95360":"STANISLAUS","95361":"STANISLAUS","95363":"STANISLAUS","95364":"TUOLUMNE","95365":"MERCED","95366":"SAN JOAQUIN","95367":"STANISLAUS","95369":"MERCED","95370":"TUOLUMNE","95372":"TUOLUMNE","95374":"MERCED","95375":"TUOLUMNE","95376":"SAN JOAQUIN","95377":"SAN JOAQUIN","95379":"TUOLUMNE","95383":"TUOLUMNE","95385":"SAN JOAQUIN","95386":"STANISLAUS","95387":"STANISLAUS","95388":"MERCED","95389":"MARIPOSA","95391":"ALAMEDA","95401":"SONOMA","95402":"SONOMA","95403":"SONOMA","95404":"SONOMA","95405":"SONOMA","95407":"SONOMA","95409":"SONOMA","95410":"MENDOCINO","95412":"SONOMA","95415":"MENDOCINO","95418":"MENDOCINO","95419":"SONOMA","95420":"MENDOCINO","95421":"SONOMA","95422":"LAKE","95423":"LAKE","95424":"LAKE","95425":"SONOMA","95426":"LAKE","95427":"MENDOCINO","95428":"MENDOCINO","95430":"SONOMA","95432":"MENDOCINO","95435":"LAKE","95436":"SONOMA","95437":"MENDOCINO","95439":"SONOMA","95441":"SONOMA","95442":"SONOMA","95443":"LAKE","95444":"SONOMA","95445":"MENDOCINO","95446":"SONOMA","95448":"SONOMA","95449":"MENDOCINO","95450":"SONOMA","95451":"LAKE","95452":"SONOMA","95453":"LAKE","95454":"MENDOCINO","95456":"MENDOCINO","95457":"LAKE","95458":"LAKE","95459":"MENDOCINO","95460":"MENDOCINO","95461":"LAKE","95462":"SONOMA","95463":"MENDOCINO","95464":"LAKE","95465":"SONOMA","95466":"MENDOCINO","95467":"LAKE","95468":"MENDOCINO","95469":"MENDOCINO","95470":"MENDOCINO","95471":"SONOMA","95472":"SONOMA","95473":"SONOMA","95476":"SONOMA","95482":"MENDOCINO","95485":"LAKE","95486":"SONOMA","95488":"MENDOCINO","95490":"MENDOCINO","95492":"SONOMA","95493":"LAKE","95494":"MENDOCINO","95497":"SONOMA","95501":"HUMBOLDT","95502":"HUMBOLDT","95503":"HUMBOLDT","95511":"HUMBOLDT","95514":"HUMBOLDT","95518":"HUMBOLDT","95519":"HUMBOLDT","95521":"HUMBOLDT","95524":"HUMBOLDT","95525":"HUMBOLDT","95526":"HUMBOLDT","95527":"TRINITY","95528":"HUMBOLDT","95536":"HUMBOLDT","95537":"HUMBOLDT","95540":"HUMBOLDT","95542":"HUMBOLDT","95546":"HUMBOLDT","95547":"HUMBOLDT","95549":"HUMBOLDT","95550":"HUMBOLDT","95551":"HUMBOLDT","95553":"HUMBOLDT","95554":"HUMBOLDT","95555":"HUMBOLDT","95556":"HUMBOLDT","95558":"HUMBOLDT","95559":"HUMBOLDT","95560":"HUMBOLDT","95562":"HUMBOLDT","95563":"TRINITY","95564":"HUMBOLDT","95565":"HUMBOLDT","95569":"HUMBOLDT","95570":"HUMBOLDT","95571":"HUMBOLDT","95573":"HUMBOLDT","95585":"MENDOCINO","95587":"MENDOCINO","95589":"HUMBOLDT","95595":"TRINITY","95601":"AMADOR","95602":"PLACER","95603":"PLACER","95604":"PLACER","95605":"YOLO","95606":"YOLO","95607":"YOLO","95612":"YOLO","95613":"EL DORADO","95614":"EL DORADO","95615":"SACRAMENTO","95616":"YOLO","95618":"YOLO","95619":"EL DORADO","95620":"SOLANO","95621":"SACRAMENTO","95623":"EL DORADO","95625":"SOLANO","95626":"PLACER","95627":"YOLO","95629":"AMADOR","95631":"PLACER","95632":"SAN JOAQUIN","95633":"EL DORADO","95634":"EL DORADO","95635":"EL DORADO","95636":"EL DORADO","95637":"YOLO","95640":"AMADOR","95641":"SACRAMENTO","95642":"AMADOR","95645":"YOLO","95648":"PLACER","95650":"PLACER","95651":"EL DORADO","95653":"YOLO","95656":"EL DORADO","95658":"PLACER","95659":"SUTTER","95661":"PLACER","95663":"PLACER","95664":"EL DORADO","95665":"AMADOR","95666":"AMADOR","95667":"EL DORADO","95668":"SUTTER","95669":"AMADOR","95672":"EL DORADO","95674":"SUTTER","95675":"AMADOR","95676":"SUTTER","95677":"PLACER","95678":"PLACER","95679":"YOLO","95680":"SACRAMENTO","95681":"PLACER","95682":"EL DORADO","95684":"EL DORADO","95685":"AMADOR","95686":"SAN JOAQUIN","95687":"SOLANO","95688":"SOLANO","95689":"AMADOR","95690":"SACRAMENTO","95691":"YOLO","95692":"YUBA","95694":"YOLO","95695":"YOLO","95697":"YOLO","95698":"YOLO","95699":"AMADOR","95701":"PLACER","95703":"PLACER","95709":"EL DORADO","95713":"PLACER","95714":"PLACER","95715":"PLACER","95717":"PLACER","95720":"EL DORADO","95722":"PLACER","95724":"NEVADA","95726":"EL DORADO","95728":"NEVADA","95735":"EL DORADO","95736":"PLACER","95746":"PLACER","95747":"PLACER","95762":"EL DORADO","95765":"PLACER","95776":"YOLO","95837":"SACRAMENTO","95901":"YUBA","95912":"COLUSA","95913":"GLENN","95914":"BUTTE","95916":"BUTTE","95917":"BUTTE","95918":"YUBA","95919":"YUBA","95920":"GLENN","95922":"YUBA","95923":"PLUMAS","95925":"YUBA","95926":"BUTTE","95927":"BUTTE","95928":"BUTTE","95929":"BUTTE","95930":"BUTTE","95932":"COLUSA","95934":"PLUMAS","95935":"YUBA","95936":"SIERRA","95937":"YOLO","95938":"BUTTE","95939":"GLENN","95941":"BUTTE","95942":"BUTTE","95943":"GLENN","95945":"NEVADA","95946":"NEVADA","95947":"PLUMAS","95948":"BUTTE","95949":"NEVADA","95950":"COLUSA","95951":"GLENN","95953":"SUTTER","95954":"BUTTE","95955":"COLUSA","95956":"PLUMAS","95957":"SUTTER","95958":"BUTTE","95959":"NEVADA","95960":"NEVADA","95961":"YUBA","95962":"YUBA","95963":"GLENN","95965":"BUTTE","95966":"BUTTE","95967":"BUTTE","95968":"BUTTE","95969":"BUTTE","95970":"COLUSA","95971":"PLUMAS","95972":"YUBA","95973":"BUTTE","95974":"BUTTE","95975":"NEVADA","95977":"YUBA","95978":"BUTTE","95979":"COLUSA","95981":"PLUMAS","95982":"SUTTER","95983":"PLUMAS","95986":"NEVADA","95987":"COLUSA","95988":"GLENN","95991":"SUTTER","95993":"SUTTER","96001":"SHASTA","96002":"SHASTA","96003":"SHASTA","96007":"SHASTA","96008":"SHASTA","96009":"LASSEN","96011":"SHASTA","96013":"SHASTA","96016":"SHASTA","96019":"SHASTA","96020":"PLUMAS","96021":"TEHAMA","96022":"SHASTA","96028":"SHASTA","96029":"TEHAMA","96033":"SHASTA","96035":"TEHAMA","96040":"SHASTA","96047":"SHASTA","96051":"SHASTA","96055":"TEHAMA","96056":"SHASTA","96059":"TEHAMA","96061":"TEHAMA","96062":"SHASTA","96065":"SHASTA","96069":"SHASTA","96071":"SHASTA","96073":"SHASTA","96074":"TEHAMA","96075":"TEHAMA","96078":"TEHAMA","96080":"TEHAMA","96084":"SHASTA","96087":"SHASTA","96088":"SHASTA","96090":"TEHAMA","96092":"TEHAMA","96095":"SHASTA","96096":"SHASTA","96125":"SIERRA","96137":"PLUMAS"};
+const DEAD = {
+  "sunpower":["SunPower",2024],"sunnova":["Sunnova",2025],"freedom forever":["Freedom Forever",2026],
+  "posigen":["PosiGen",2025],"titan solar":["Titan Solar",2024],"infinity energy":["Infinity Energy",2024],
+  "vivint":["Vivint Solar",2020],"sunworks":["Sunworks",2024]
+};
+const LABEL = {
+  plan:"Move to the best rate plan",
+  baseline:"Find and cut the always-on load",
+  shift:"Move timed loads (water heater, laundry, EV, pool pump) to midday",
+  pv:"Recover lost production (soiling, shading, dead string)",
+  batt:"Correct the battery settings"
+};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const money = n => "$" + n.toLocaleString("en-US");
+
+// year select: 2023 splits at the NEM 3.0 cutover (applications after Apr 14, 2023)
+const ys = document.getElementById("year");
+const opts = [["2026","3.0"],["2025","3.0"],["2024","3.0"],
+  ["2023 — April or later","3.0"],["2023 — before April","2.0"]];
+for (let y=2022;y>=2012;y--) opts.push([String(y),"2.0"]);
+opts.forEach(([t,n],i)=>{const o=document.createElement("option");o.textContent=t;o.dataset.nem=n;
+  o.dataset.yr=t.slice(0,4);if(t==="2021")o.selected=true;ys.appendChild(o);});
+
+function bandStyle(lo,hi,max){
+  const l=Math.max(0,Math.min(100,lo/max*100)), r=Math.max(0,Math.min(100,100-hi/max*100));
+  return `left:${l.toFixed(1)}%; right:${Math.max(r,1.5).toFixed(1)}%`;
+}
+
+function build(){
+  const zip=document.getElementById("zip").value.trim();
+  const sel=ys.options[ys.selectedIndex];
+  const nem=sel.dataset.nem, yr=+sel.dataset.yr;
+  const size=parseFloat(document.getElementById("size").value);
+  const bkwh=parseFloat(document.getElementById("batt").value)||0;
+  const inst=document.getElementById("inst").value.trim();
+  const err=document.getElementById("err");
+  if(!/^\d{5}$/.test(zip)){err.textContent="Enter a 5-digit ZIP.";return;}
+  if(!(size>0.5&&size<60)){err.textContent="System size should be between 1 and 60 kW.";return;}
+  err.textContent="";
+
+  const county = ZIPC[zip] || "";
+  const clim = DATA.cc[county] || "inland";
+  const stor = bkwh>0 ? 1 : 0;
+  const pv = DATA.pv.reduce((a,b)=>Math.abs(b-size)<Math.abs(a-size)?b:a);
+  const d = DATA.t[`${nem}|${stor}|${clim}|${pv}`];
+  const climName = {coastal:"coastal",inland:"inland",valley:"Central Valley"}[clim];
+
+  // ── certain ──
+  const key = Object.keys(DEAD).find(k=>inst.toLowerCase().includes(k));
+  let certain = "";
+  if(key){
+    const [nm,y]=DEAD[key];
+    certain += `<div class="finding bad"><p>Your installer, <strong>${esc(nm)} went out of business in ${y}.</strong></p>
+      <p>Your workmanship warranty has no one behind it. More quietly: nobody is watching your system anymore. Monitoring only alarms on hard failures — a microinverter that dies outright. It never alarms on a system that slowly drifts down.</p></div>`;
+  }
+  const age = 2026 - yr;
+  if(age>=8){
+    certain += `<div class="finding"><p>Your system is about <strong>${age} years old.</strong></p>
+      <p>Most inverters carry a 10–12 year warranty against 25 years on the panels. You're approaching the replacement window — worth planning for rather than being surprised by.</p></div>`;
+  }
+
+  // ── structural ──
+  let struct = "";
+  if(stor && nem==="2.0"){
+    const k = bkwh/13.5;
+    const lo = Math.round(d.batt[0]*k/10)*10, hi = Math.round(d.batt[1]*k/10)*10;
+    struct += `<div class="finding"><p><strong>Your battery is probably costing you money.</strong></p>
+      <p>On NEM 2.0, every kilowatt-hour you export is credited at the full retail rate. Storing a kilowatt-hour to use at night and sending it straight to the grid at noon are worth <em>exactly the same</em> on your bill. The battery captures no price spread — but it still takes on cycling wear.</p>
+      <p>Switching it to backup-only, no daily cycling, should save roughly <strong>${money(lo)}–${money(hi)} a year</strong> with no loss in bill savings.</p>
+      <p class="prov">This held in every "NEM 2.0 + battery" case in our model. It depends only on your tariff and battery size, not on your usage. It does not apply on NEM 3.0, where the spread is real.</p></div>`;
+  }
+  if(stor && nem==="3.0"){
+    struct += `<div class="finding"><p><strong>Don't buy "battery optimization" as a service.</strong></p>
+      <p>On NEM 3.0 your evening load already sits inside the peak window, so your installer's default self-consumption mode is putting about 86% of discharge into the most expensive hours by itself. In our model, switching to forecast-based dispatch was worth roughly nothing.</p></div>`;
+  }
+  if(!stor && nem==="3.0"){
+    struct += `<div class="finding"><p><strong>Your midday surplus is worth about a ninth of your evening power.</strong></p>
+      <p>On NEM 3.0 without storage, exported midday energy earns roughly $0.06/kWh while evening imports cost around $0.54. Moving heavy loads into the middle of the day costs nothing and is usually worth more than adding a battery.</p></div>`;
+  }
+  if(!stor && nem==="2.0"){
+    struct += `<div class="finding"><p><strong>Timing matters less for you than for almost anyone else.</strong></p>
+      <p>Full net metering credits your exports at retail, so shifting loads around the clock barely moves your bill. Your money is in production you're not getting and power you didn't know you were using — not in when you run the dishwasher.</p></div>`;
+  }
+
+  // ── estimated ──
+  const max = Math.max(5000, Math.ceil(d.comb[1]/1000)*1000);
+  const meds = Object.entries(d.med).sort((a,b)=>b[1]-a[1])
+    .map(([k,v])=>`<li><span class="lab">${LABEL[k]}</span><span class="amt">~${money(v)}</span></li>`).join("");
+
+  const subject = encodeURIComponent(`Solar health check — ${zip}, ${size} kW`);
+  const body = encodeURIComponent(
+`I'd like the full report.
+
+My system:
+- ZIP: ${zip}
+- Installed: ${sel.textContent}
+- System size: ${size} kW
+- Battery: ${bkwh>0?bkwh+" kWh":"none"}
+- Installer: ${inst||"—"}
+
+(Reply and I'll send the Green Button steps.)`);
+
+  document.getElementById("out").innerHTML = `
+  <section class="tier t-known">
+    <div class="tier-hd"><span class="tag">Certain</span><h2>From your tariff and public filings</h2></div>
+    ${certain || `<div class="finding"><p>Nothing alarming in the public record: your installer is still trading, and at ${age} year${age===1?"":"s"} old your system is well inside its warranty window.</p></div>`}
+  </section>
+
+  <section class="tier t-known">
+    <div class="tier-hd"><span class="tag">Structural</span><h2>Follows from your tariff and equipment</h2>
+      <span class="note">independent of how much you use</span></div>
+    ${struct}
+  </section>
+
+  <section class="tier t-guess">
+    <div class="tier-hd"><span class="tag">Estimated</span><h2>Depends on assumptions about your usage</h2>
+      <span class="note">a range for homes like yours, not your number</span></div>
+    <div class="finding"><p>A ${size} kW system in a ${climName} climate usually pairs with a household using somewhere between <span class="mono">${d.load[0].toLocaleString()}</span> and <span class="mono">${d.load[1].toLocaleString()}</span> kWh a year. Across that range, comparable homes are leaving this much on the table annually:</p></div>
+    <div class="bands">
+      <div class="band-row">
+        <div class="band-lbl"><span class="n">Total recoverable</span><span class="v">${money(d.comb[0])} – ${money(d.comb[1])}</span></div>
+        <div class="track"><div class="fill" style="${bandStyle(d.comb[0],d.comb[1],max)}"></div></div>
+      </div>
+      <div class="band-row">
+        <div class="band-lbl"><span class="n">Findable from usage data</span><span class="v">${money(d.meter[0])} – ${money(d.meter[1])}</span></div>
+        <div class="track"><div class="fill faint" style="${bandStyle(d.meter[0],d.meter[1],max)}"></div></div>
+      </div>
+      <div class="band-row">
+        <div class="band-lbl"><span class="n">Findable from inverter data</span><span class="v">${money(d.telem[0])} – ${money(d.telem[1])}</span></div>
+        <div class="track"><div class="fill faint" style="${bandStyle(d.telem[0],d.telem[1],max)}"></div></div>
+        <div class="scale"><span>$0</span><span>${money(max/2)}</span><span>${money(max)}</span></div>
+      </div>
+      <p class="bands-foot">Those bars are wide because we don't know whether you have a pool, how hard your AC works, when you run laundry, or when your car charges. <strong>Narrowing them to a single number is exactly what your data would do.</strong></p>
+    </div>
+    <div class="finding"><p>Within that range, the typical size of each item:</p>
+      <ul class="items">${meds}</ul>
+      <p class="prov">These are medians for similar homes, not figures for your house. The always-on load especially — we have no way to know whether yours is 300 W or 1,000 W, and that one is often the largest single item on the list.</p></div>
+  </section>
+
+  <section class="cta">
+    <h2>What we can tell you once you connect your data</h2>
+    <p style="margin:0">Sharing your PG&amp;E 15-minute usage data (Green Button — one authorization, revocable any time) collapses every bar above into a single number, and gets specific:</p>
+    <ul>
+      <li>Which rate plan you should be on, and what the switch saves each month — recalculated against your actual last 12 months</li>
+      <li>What that device drawing power at 3 a.m. is, and what it costs you a year</li>
+      <li>Which of your timers are set to the wrong hours, and what each one is worth</li>
+    </ul>
+    <p class="handoff">This is the only point where anything leaves your device — and it leaves as an email you write and send yourself, so you can see exactly what's in it before it goes.</p>
+    <a class="btn" href="mailto:${CONTACT}?subject=${subject}&body=${body}">Get the full report</a>
+    <ol class="steps">
+      <li>Your mail app opens with the five details above already filled in. Edit or delete anything before sending.</li>
+      <li>We send you PG&amp;E's Green Button steps. About two minutes.</li>
+      <li>You get the full report within 48 hours.</li>
+    </ol>
+    <p class="fine">We don't sell your data or pass it to anyone. You can revoke access from your PG&amp;E account at any time. Right now a person reads every request — we're early, and we'd rather do this properly than at scale. <a href="data-use.html" target="_blank" rel="noopener">What happens to your data →</a></p>
+  </section>`;
+  document.getElementById("mailnote").textContent =
+    CONTACT.startsWith("REPLACE") ? "Setup note: replace CONTACT at the top of the script with a real inbox before sharing this page." : "";
+}
+const form = document.getElementById("form");
+const okFlag = document.getElementById("ok");
+let flagTimer;
+
+// The form never posts anywhere — it recalculates in place.
+form.addEventListener("submit", e => {
+  e.preventDefault();
+  build();
+  if (document.getElementById("err").textContent) return;
+  okFlag.hidden = false;
+  clearTimeout(flagTimer);
+  flagTimer = setTimeout(() => { okFlag.hidden = true; }, 2200);
+  const out = document.getElementById("out");
+  if (out.firstElementChild) {
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    out.firstElementChild.scrollIntoView({behavior: reduce ? "auto" : "smooth", block: "start"});
+  }
+});
+
+// keep the results honest to the fields even if they never press the button
+form.addEventListener("input", () => { build(); okFlag.hidden = true; });
+form.addEventListener("change", () => { build(); okFlag.hidden = true; });
+
+build();
+</script>
+
+</body>
+</html>

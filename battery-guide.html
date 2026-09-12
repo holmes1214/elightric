@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="How to put a home battery into backup-only mode: Tesla, Enphase, SolarEdge.">
+<meta name="robots" content="noindex">
+<style>
+  :root{color-scheme:light dark}
+  body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+</style>
+<title>Battery Backup-Only Switch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+</head>
+<body>
+<style>
+:root{
+  --paper:#F2F5F1; --surface:#FFFFFF; --surface-2:#E9EEE8;
+  --ink:#13201A; --ink-2:#3D4E45; --ink-3:#6B7A72;
+  --rule:#D2DBD0; --rule-2:#BFCCBC;
+  --known:#1E6B4A; --known-wash:#E2EFE7;
+  --alert:#A23B1E; --alert-wash:#F7E9E3;
+  --btn-ink:#FFFFFF;
+  --shadow:0 1px 2px rgba(19,32,26,.05),0 8px 24px -12px rgba(19,32,26,.18);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0E1512; --surface:#161F1A; --surface-2:#1E2922;
+  --ink:#E8EFE9; --ink-2:#B4C2B8; --ink-3:#87968C;
+  --rule:#2A362F; --rule-2:#3A4941;
+  --known:#5FC896; --known-wash:#17301F;
+  --alert:#E88A67; --alert-wash:#331C13;
+  --btn-ink:#0E1512;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+}}
+:root[data-theme="dark"]{
+  --paper:#0E1512; --surface:#161F1A; --surface-2:#1E2922;
+  --ink:#E8EFE9; --ink-2:#B4C2B8; --ink-3:#87968C;
+  --rule:#2A362F; --rule-2:#3A4941;
+  --known:#5FC896; --known-wash:#17301F;
+  --alert:#E88A67; --alert-wash:#331C13;
+  --btn-ink:#0E1512;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:"IBM Plex Serif",Georgia,serif;
+  font-size:16.5px;line-height:1.62;margin:0;-webkit-font-smoothing:antialiased}
+.wrap{max-width:44rem;margin:0 auto;padding:2.5rem 1.25rem 5rem;display:flex;flex-direction:column;gap:2.5rem}
+h1,h2,h3,.ui{font-family:"IBM Plex Sans",system-ui,sans-serif}
+h1{font-size:clamp(1.7rem,5.5vw,2.25rem);line-height:1.16;margin:0;font-weight:600;letter-spacing:-.02em;text-wrap:balance}
+.dek{color:var(--ink-2);margin:0;font-size:1.02rem;max-width:36rem}
+.mast{display:flex;flex-direction:column;gap:.85rem}
+.badge{display:inline-flex;align-self:flex-start;font-family:"IBM Plex Mono",monospace;font-size:.66rem;
+  letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);border:1px dashed var(--rule-2);
+  border-radius:2px;padding:.3rem .6rem}
+
+/* eligibility gate — the one thing that must not be missed */
+.gate{background:var(--alert-wash);border:1px solid var(--alert);border-radius:3px;padding:1.2rem 1.25rem;
+  display:flex;flex-direction:column;gap:.6rem}
+.gate h2{margin:0;font-size:1.02rem;font-weight:600;color:var(--alert)}
+.gate p{margin:0;font-size:.95rem}
+.gate ul{margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.3rem;font-size:.95rem}
+
+.why{display:flex;flex-direction:column;gap:.75rem}
+.why h2{font-size:1.08rem;margin:0;font-weight:600}
+.why p{margin:0}
+
+/* per-brand cards */
+.brands{display:flex;flex-direction:column;gap:1.35rem}
+.brand{background:var(--surface);border:1px solid var(--rule);border-radius:3px;box-shadow:var(--shadow);overflow:hidden}
+.brand-hd{padding:.8rem 1.15rem;border-bottom:1px solid var(--rule);background:var(--surface-2);
+  display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap}
+.brand-hd h3{margin:0;font-size:1.02rem;font-weight:600}
+.brand-hd .what{font-family:"IBM Plex Mono",monospace;font-size:.7rem;color:var(--ink-3)}
+.brand-body{padding:1.15rem;display:flex;flex-direction:column;gap:.95rem}
+
+/* the navigation path — steps are a real sequence, so they are numbered */
+.path{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0}
+.path li{display:flex;gap:.8rem;align-items:flex-start;padding:.5rem 0;border-bottom:1px dotted var(--rule)}
+.path li:last-child{border-bottom:0}
+.path .n{flex:0 0 1.45rem;height:1.45rem;border-radius:50%;background:var(--known-wash);color:var(--known);
+  font-family:"IBM Plex Mono",monospace;font-size:.74rem;font-weight:600;display:grid;place-items:center;margin-top:.1rem}
+.path .s{font-family:"IBM Plex Sans",sans-serif;font-size:.93rem;line-height:1.45}
+.tap{font-family:"IBM Plex Mono",monospace;background:var(--surface-2);border:1px solid var(--rule);
+  border-radius:2px;padding:.06rem .32rem;font-size:.86em;white-space:nowrap}
+.result{background:var(--known-wash);border-radius:2px;padding:.6rem .8rem;margin:0;
+  font-family:"IBM Plex Sans",sans-serif;font-size:.86rem;color:var(--ink-2)}
+.caveat{margin:0;font-family:"IBM Plex Sans",sans-serif;font-size:.83rem;color:var(--ink-3)}
+.caveat a,.src a{color:inherit}
+.src{margin:0;font-family:"IBM Plex Sans",sans-serif;font-size:.79rem;color:var(--ink-3);
+  border-top:1px dotted var(--rule-2);padding-top:.6rem}
+
+.after{background:var(--surface);border:1px solid var(--known);border-radius:3px;padding:1.4rem 1.25rem;
+  display:flex;flex-direction:column;gap:.85rem;box-shadow:var(--shadow)}
+.after h2{margin:0;font-size:1.12rem;font-weight:600}
+.after ul{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.38rem}
+footer{border-top:1px solid var(--rule);padding-top:1.2rem;display:flex;flex-direction:column;gap:.5rem}
+footer p{margin:0;font-family:"IBM Plex Sans",sans-serif;font-size:.78rem;color:var(--ink-3)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <span class="badge">Five minutes · no tools · reversible</span>
+    <h1>Switching your battery to backup-only</h1>
+    <p class="dek">If you're on NEM 2.0, your battery earns nothing from its daily cycle but still wears out doing it. Here's how to stop that in each of the three main apps — and how to tell whether it applies to you at all.</p>
+  </header>
+
+  <section class="gate">
+    <h2>⚠ Check this first — it's the wrong move for most people</h2>
+    <p>Do this <strong>only</strong> if both are true:</p>
+    <ul>
+      <li>You're on <strong>NEM 2.0 or NEM 1.0</strong> — in practice, your system was approved <strong>before April 15, 2023</strong></li>
+      <li>You have a <strong>battery</strong></li>
+    </ul>
+    <p>On <strong>NEM 3.0 / NBT</strong> (approved April 2023 or later) this would <em>cost</em> you money — there the evening price spread is real and your battery is earning it. Don't do this.</p>
+  </section>
+
+  <section class="why">
+    <h2>Why it's free money on NEM 2.0</h2>
+    <p>Under full net metering, every kilowatt-hour you export is credited at the full retail rate. So storing a kilowatt-hour to use at 8 p.m. and pushing it to the grid at noon are worth <em>exactly the same</em> on your bill. The battery captures no price spread.</p>
+    <p>But it still cycles — and every cycle uses up a slice of a warranty measured in throughput. You're spending battery life to buy nothing. Stopping the daily cycle is worth roughly <strong>$150–$600 a year</strong> in deferred wear for a typical 10–13.5 kWh battery, and costs you nothing on the bill.</p>
+    <p>Your backup capacity is unaffected. In fact it goes up: the battery sits full instead of half-drained.</p>
+  </section>
+
+  <section class="brands">
+
+    <article class="brand">
+      <div class="brand-hd"><h3>Tesla Powerwall</h3><span class="what">Backup Reserve → 100%</span></div>
+      <div class="brand-body">
+        <ol class="path">
+          <li><span class="n">1</span><span class="s">Open the <span class="tap">Tesla</span> app and select your energy site</span></li>
+          <li><span class="n">2</span><span class="s">From the energy home screen, tap <span class="tap">Settings</span></span></li>
+          <li><span class="n">3</span><span class="s">Tap <span class="tap">Powerwall</span></span></li>
+          <li><span class="n">4</span><span class="s">Drag the <span class="tap">Backup Reserve</span> slider all the way to <strong>100%</strong></span></li>
+        </ol>
+        <p class="result">Tesla's own documentation confirms the effect: a backup reserve of 100% “prevents use of Self-Powered mode or Savings mode.” That is precisely what you want here — no daily cycling.</p>
+        <p class="caveat"><strong>You'll see a warning</strong> that this “will negatively impact the potential economic benefits.” That warning is written for NEM 3.0 customers, where it's true. On NEM 2.0 there are no economic benefits to lose. Proceed.</p>
+        <p class="caveat">There is no longer a separate “Backup-only” mode in the current app — the 100% reserve setting replaces it.</p>
+        <p class="src">Source: <a href="https://www.tesla.com/support/energy/powerwall/mobile-app/backup-reserve">Tesla Support — Backup Reserve</a></p>
+      </div>
+    </article>
+
+    <article class="brand">
+      <div class="brand-hd"><h3>Enphase IQ Battery</h3><span class="what">Profile → Full Backup</span></div>
+      <div class="brand-body">
+        <ol class="path">
+          <li><span class="n">1</span><span class="s">Open the <span class="tap">Enphase</span> app</span></li>
+          <li><span class="n">2</span><span class="s">Tap <span class="tap">Menu</span>, then <span class="tap">Settings</span></span></li>
+          <li><span class="n">3</span><span class="s">Tap <span class="tap">Battery</span></span></li>
+          <li><span class="n">4</span><span class="s">Change the profile from <span class="tap">Self-Consumption</span> (or <span class="tap">Savings</span>) to <span class="tap">Full Backup</span></span></li>
+        </ol>
+        <p class="result">Full Backup reserves the whole battery for outages and stops the daily charge-discharge cycle.</p>
+        <p class="caveat">Depending on your app version the profile may be labelled <em>Full backup</em> or shown as a reserve slider you push to 100%. Either reaches the same place. If you only see <em>Backup — partial</em>, set the reserve to its maximum.</p>
+        <p class="src">Source: <a href="https://enphaseenergy.com/learn/home-energy/explore-your-system/know-your-enphase-storage-system">Enphase — Know your storage system</a></p>
+      </div>
+    </article>
+
+    <article class="brand">
+      <div class="brand-hd"><h3>SolarEdge Home Battery</h3><span class="what">Battery Mode → Backup Only</span></div>
+      <div class="brand-body">
+        <ol class="path">
+          <li><span class="n">1</span><span class="s">Open the <span class="tap">mySolarEdge</span> app</span></li>
+          <li><span class="n">2</span><span class="s">Tap the <span class="tap">Battery</span> icon in the bottom bar</span></li>
+          <li><span class="n">3</span><span class="s">Go to <span class="tap">Battery Mode</span> → <span class="tap">Battery Mode Panel</span></span></li>
+          <li><span class="n">4</span><span class="s">Select <span class="tap">Backup Only</span></span></li>
+        </ol>
+        <p class="result">SolarEdge describes Backup Only as keeping the battery fully charged and reserved for outages.</p>
+        <p class="caveat">Two conditions from SolarEdge's own note: you must be listed as <strong>Site Owner</strong> on the account, and Backup Only appears <strong>only on backup-configured sites</strong>. If you don't see it, your system was likely installed without a backup interface — in that case there's nothing to switch, and the finding doesn't apply to you.</p>
+        <p class="src">Source: <a href="https://knowledge-center.solaredge.com/sites/kc/files/se-battery-mode-control-application-note.pdf">SolarEdge — Set Battery Mode Control in mySolarEdge (June 2025)</a></p>
+      </div>
+    </article>
+
+  </section>
+
+  <section class="after">
+    <h2>After you switch</h2>
+    <ul>
+      <li><strong>Check it held.</strong> Look again the next morning. Some apps quietly revert the setting after a firmware update.</li>
+      <li><strong>Your bill shouldn't change.</strong> That's the point — you're saving battery life, not kilowatt-hours. If your bill goes <em>up</em> noticeably over the next two cycles, something else is going on and it's worth a look.</li>
+      <li><strong>It's fully reversible.</strong> Same path, put it back.</li>
+      <li><strong>Revisit it if your tariff changes.</strong> Adding capacity or moving to a new home can put you on NEM 3.0, and then the logic flips.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>Menu paths verified against each manufacturer's current published documentation, linked above. Apps change — if a screen doesn't match, the vendor page is the authority, not this one.</p>
+    <p>The dollar figure is an estimate from an 8,760-hour energy model using published 2026 PG&amp;E rates, not a promise. It reflects deferred battery wear, not a change in your bill.</p>
+    <p>This is general guidance about a setting you control. It isn't advice about your specific installation, and it doesn't change anything in your warranty or your contract.</p>
+  </footer>
+
+</div>
+
+</body>
+</html>
