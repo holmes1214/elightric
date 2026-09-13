@@ -22,7 +22,7 @@
 /* Saturation encodes certainty: what we know is saturated, what we estimate is flat. */
 :root{
   --paper:#F2F5F1; --surface:#FFFFFF; --surface-2:#E9EEE8;
-  --ink:#13201A; --ink-2:#3D4E45; --ink-3:#6B7A72;
+  --ink:#13201A; --ink-2:#3D4E45; --ink-3:#5D6A63;
   --rule:#D2DBD0; --rule-2:#BFCCBC;
   --known:#1E6B4A; --known-wash:#E2EFE7;
   --alert:#A23B1E; --guess:#7C8A82; --guess-wash:#E4E9E3;
@@ -69,7 +69,7 @@ h1{font-size:clamp(1.7rem,5.5vw,2.3rem);line-height:1.15;margin:0;font-weight:60
 .f label{font-size:.79rem;color:var(--ink-2);font-weight:500}
 .f .sub{font-size:.71rem;color:var(--ink-3);font-weight:400}
 .f input,.f select{background:var(--field);color:var(--ink);border:1px solid var(--rule-2);border-radius:2px;
-  padding:.5rem .6rem;font-size:.93rem;width:100%;font-family:"IBM Plex Mono",monospace}
+  padding:.5rem .6rem;font-size:16px;width:100%;font-family:"IBM Plex Mono",monospace}
 .f input:focus,.f select:focus{outline:2px solid var(--known);outline-offset:-1px;border-color:transparent}
 .actions{padding:0 1.15rem 1.15rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
 .btn{font-weight:600;font-size:.95rem;background:var(--known);color:var(--btn-ink);border:0;border-radius:3px;
@@ -226,8 +226,9 @@ function build(){
   const bkwh=parseFloat(document.getElementById("batt").value)||0;
   const inst=document.getElementById("inst").value.trim();
   const err=document.getElementById("err");
-  if(!/^\d{5}$/.test(zip)){err.textContent="Enter a 5-digit ZIP.";return;}
-  if(!(size>0.5&&size<60)){err.textContent="System size should be between 1 and 60 kW.";return;}
+  const stale=()=>{document.getElementById("out").innerHTML="";};
+  if(!/^\d{5}$/.test(zip)){err.textContent="Enter a 5-digit ZIP.";stale();return;}
+  if(!(size>0.5&&size<60)){err.textContent="System size should be between 1 and 60 kW.";stale();return;}
   err.textContent="";
 
   const inPGE = Object.prototype.hasOwnProperty.call(ZIPC, zip);
@@ -266,7 +267,7 @@ function build(){
   }
   if(stor && nem==="3.0"){
     struct += `<div class="finding"><p><strong>Don't buy "battery optimization" as a service.</strong></p>
-      <p>On NEM 3.0 your evening load already sits inside the peak window, so your installer's default self-consumption mode is putting about 86% of discharge into the most expensive hours by itself. In our model, switching to forecast-based dispatch was worth roughly nothing.</p></div>`;
+      <p>On NEM 3.0 your evening load already sits inside the peak window, so your installer's default self-consumption mode is putting most of the discharge into the most expensive hours by itself. In our model${inPGE?" — where the default mode already lands about 86% of discharge in peak — ":", "}switching to forecast-based dispatch was worth roughly nothing.</p></div>`;
   }
   if(!stor && nem==="3.0"){
     struct += `<div class="finding"><p><strong>Your midday surplus is worth about a ninth of your evening power.</strong></p>
@@ -299,7 +300,7 @@ My system:
   document.getElementById("out").innerHTML = `
   <section class="tier t-known">
     <div class="tier-hd"><span class="tag">Certain</span><h2>From your tariff and public filings</h2></div>
-    ${certain || `<div class="finding"><p>Nothing alarming in the public record: your installer is still trading, and at ${age} year${age===1?"":"s"} old your system is well inside its warranty window.</p></div>`}
+    ${certain || `<div class="finding"><p>Nothing alarming in the public record: your installer is still trading, and ${age<=0?"a system installed this year is":`at ${age} year${age===1?"":"s"} old your system is`} well inside its warranty window.</p></div>`}
   </section>
 
   <section class="tier t-known">
