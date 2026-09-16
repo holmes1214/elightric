@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="How to export your Tesla Powerwall data and your SCE usage history.">
+<meta name="description" content="给 Tian Ying 的取数指引：Tesla App 与 SCE 用电数据导出步骤。">
 <meta name="robots" content="noindex">
 <style>
   :root{color-scheme:light dark}
@@ -12,10 +12,10 @@
   img{max-width:100%}
   [hidden]{display:none!important}
 </style>
-<title>Tesla and SCE Exports</title>
+<title>Tesla 与 SCE 取数</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 </head>
 <body>
 <style>
@@ -25,7 +25,6 @@
   --rule:#D2DBD0; --rule-2:#BFCCBC;
   --known:#1E6B4A; --known-wash:#E2EFE7;
   --no:#A23B1E; --no-wash:#F7E9E3;
-  --btn-ink:#FFFFFF;
   --shadow:0 1px 2px rgba(19,32,26,.05),0 8px 24px -12px rgba(19,32,26,.18);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
@@ -34,7 +33,6 @@
   --rule:#2A362F; --rule-2:#3A4941;
   --known:#5FC896; --known-wash:#17301F;
   --no:#E88A67; --no-wash:#331C13;
-  --btn-ink:#0E1512;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
 }}
 :root[data-theme="dark"]{
@@ -43,181 +41,111 @@
   --rule:#2A362F; --rule-2:#3A4941;
   --known:#5FC896; --known-wash:#17301F;
   --no:#E88A67; --no-wash:#331C13;
-  --btn-ink:#0E1512;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
 }
 *{box-sizing:border-box}
 body{background:var(--paper);color:var(--ink);
-  font-family:"IBM Plex Serif",Georgia,serif;font-size:16.5px;line-height:1.6;
-  margin:0;-webkit-font-smoothing:antialiased}
-.wrap{max-width:40rem;margin:0 auto;padding-inline:1.25rem;padding-block:2.5rem 4.5rem;
-  display:flex;flex-direction:column;gap:2.2rem}
-h1,h2,h3,.ui{font-family:"IBM Plex Sans",system-ui,sans-serif}
-h1{font-size:clamp(1.65rem,5.5vw,2.15rem);line-height:1.16;margin:0;font-weight:600;
-  letter-spacing:-.02em;text-wrap:balance}
-h2{font-size:1.05rem;margin:0;font-weight:600;letter-spacing:-.01em}
+  font-family:"IBM Plex Sans","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+  font-size:17px;line-height:1.75;margin:0;-webkit-font-smoothing:antialiased}
+.wrap{max-width:34rem;margin:0 auto;padding-inline:1.25rem;padding-block:2.5rem 4rem;
+  display:flex;flex-direction:column;gap:1.6rem}
+h1{font-size:1.6rem;line-height:1.3;margin:0;font-weight:600;letter-spacing:-.01em}
+h2{font-size:1.05rem;margin:0;font-weight:600}
 p{margin:0}
-.mast{display:flex;flex-direction:column;gap:.85rem}
-.badge{display:inline-flex;align-self:flex-start;font-family:"IBM Plex Mono",monospace;
-  font-size:.65rem;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);
-  border:1px dashed var(--rule-2);border-radius:2px;padding:.3rem .6rem}
-.dek{color:var(--ink-2);margin:0;font-size:1rem}
-.zh{font-family:"IBM Plex Sans","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
-  font-size:.88rem;color:var(--ink-3);line-height:1.55}
+.lede{color:var(--ink-2);font-size:1rem}
 
-/* gate */
-.gate{background:var(--no-wash);border:1px solid var(--no);border-radius:3px;
-  padding:1.2rem 1.25rem;display:flex;flex-direction:column;gap:.6rem}
-.gate h2{color:var(--no)}
-
-/* task blocks */
-.task{background:var(--surface);border:1px solid var(--rule);border-radius:3px;
+.step{background:var(--surface);border:1px solid var(--rule);border-radius:4px;
   box-shadow:var(--shadow);overflow:hidden}
-.task-hd{padding:.8rem 1.15rem;border-bottom:1px solid var(--rule);background:var(--surface-2);
-  display:flex;align-items:baseline;justify-content:space-between;gap:1rem;flex-wrap:wrap}
-.task-hd h2{flex:1 1 auto}
-.cost{font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
-.task-body{padding:1.15rem;display:flex;flex-direction:column;gap:.85rem}
-ol.steps{margin:0;padding-left:1.35rem;display:flex;flex-direction:column;gap:.7rem}
-ol.steps li{padding-left:.15rem}
-ol.steps li > .zh{margin-top:.2rem}
-code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--surface-2);
-  border:1px solid var(--rule);border-radius:2px;padding:.08em .35em;
-  word-break:break-word}
-.note{font-family:"IBM Plex Sans",sans-serif;font-size:.85rem;color:var(--ink-3);
-  border-left:2px solid var(--rule-2);padding-left:.75rem;line-height:1.5}
-.want{background:var(--known-wash);border-radius:2px;padding:.7rem .85rem;
-  font-family:"IBM Plex Sans",sans-serif;font-size:.88rem;color:var(--ink-2)}
-.want strong{color:var(--known)}
-.strip{background:var(--no-wash);border-left:3px solid var(--no);padding:.7rem .85rem;
-  font-family:"IBM Plex Sans",sans-serif;font-size:.88rem;color:var(--ink-2)}
+.step-hd{padding:.75rem 1.1rem;border-bottom:1px solid var(--rule);background:var(--surface-2);
+  display:flex;align-items:baseline;gap:.6rem}
+.num{font-family:"IBM Plex Mono",monospace;font-size:.95rem;font-weight:600;color:var(--known)}
+.step-body{padding:1.05rem 1.1rem;display:flex;flex-direction:column;gap:.7rem}
+ol{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:.65rem}
+li{padding-left:.1rem}
+code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--surface-2);
+  border:1px solid var(--rule);border-radius:2px;padding:.1em .38em;word-break:break-word;
+  white-space:nowrap}
+.tip{background:var(--known-wash);border-radius:3px;padding:.65rem .8rem;
+  font-size:.93rem;color:var(--ink-2)}
+.warn{background:var(--no-wash);border-left:3px solid var(--no);padding:.8rem .9rem;
+  font-size:.95rem;color:var(--ink-2);border-radius:0 3px 3px 0}
 
-/* collision callout */
-.collide{background:var(--surface);border:1px dashed var(--no);border-radius:3px;
-  padding:1rem 1.1rem;display:flex;flex-direction:column;gap:.5rem}
-
-/* checklist */
-.check{background:var(--surface);border:1px solid var(--rule);border-radius:3px;padding:1.15rem;
-  display:flex;flex-direction:column;gap:.75rem}
-.check ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:.55rem}
-.check li{font-family:"IBM Plex Sans",sans-serif;font-size:.92rem;line-height:1.45;
-  padding-left:1.6rem;position:relative}
-.check li::before{content:"";position:absolute;left:0;top:.18em;width:.95rem;height:.95rem;
+.done{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:1.1rem;
+  display:flex;flex-direction:column;gap:.7rem}
+.done ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.done li{font-size:.98rem;padding-left:1.7rem;position:relative}
+.done li::before{content:"";position:absolute;left:0;top:.42em;width:1rem;height:1rem;
   border:1.5px solid var(--rule-2);border-radius:2px}
-.check li em{font-style:normal;color:var(--ink-3);font-size:.86em}
 
 a{color:var(--known);text-underline-offset:2px}
-a:focus-visible,li:focus-visible{outline:2px solid var(--known);outline-offset:2px}
-
-footer{border-top:1px solid var(--rule);padding-top:1.15rem;display:flex;flex-direction:column;gap:.5rem}
-footer p{font-family:"IBM Plex Sans",sans-serif;font-size:.8rem;color:var(--ink-3);line-height:1.5}
+a:focus-visible{outline:2px solid var(--known);outline-offset:2px}
+footer{font-size:.88rem;color:var(--ink-3);line-height:1.6;
+  border-top:1px solid var(--rule);padding-top:1rem}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
 <div class="wrap">
 
-  <header class="mast">
-    <span class="badge">Two exports · about ten minutes total</span>
-    <h1>Getting your energy data out</h1>
-    <p class="dek">Your system and your utility each hold half the picture. Neither half is much use alone. Here is how to get both — from your phone and a browser, no special software.</p>
-    <p class="zh">你的逆变器和电力公司各掌握一半数据，单看任何一半都得不出结论。下面两件事合起来约十分钟。</p>
+  <header style="display:flex;flex-direction:column;gap:.6rem">
+    <h1>Tian Ying，麻烦你花十分钟</h1>
+    <p class="lede">三件事，一件在手机上、两件在电脑上。做完回复邮件发给我们就行。</p>
   </header>
 
-  <section class="gate">
-    <h2>First — is the system actually running?</h2>
-    <p>Task A only exists once your Powerwall has been commissioned and SCE has granted Permission to Operate. If you have not received a PTO letter from SCE, or the Tesla app does not yet show your system, <strong>skip to Task B</strong> and send us the date your installer expects to finish.</p>
-    <p class="zh">A 部分要等 Powerwall 调试完成、且 SCE 发了并网许可（PTO）之后才存在。如果还没收到 PTO、或 Tesla App 里还看不到你的系统，请直接跳到 B，并告诉我们安装商预计的完工时间。</p>
-  </section>
-
-  <div class="task">
-    <div class="task-hd"><h2>Task A · Tesla app</h2><span class="cost">2 minutes · phone</span></div>
-    <div class="task-body">
-      <ol class="steps">
-        <li>Open the <strong>Tesla app</strong> and go to the <code>Energy</code> tab.
-          <div class="zh">打开 Tesla App，进入 Energy（能源）标签页。</div></li>
-        <li>Pick the timescale <em>before</em> you export — the export covers whatever period is on screen. Choose <code>Month</code>, or <code>Lifetime</code> if the system is less than a year old.
-          <div class="zh">先选好时间范围再导出——导出的就是屏幕上当前显示的那段。选 Month（月）；系统运行不满一年的话选 Lifetime（全部）。</div></li>
-        <li>On the graph screen, tap the <strong>three dots</strong> in the top right, then <code>Download My Data</code>. The file is a CSV.
-          <div class="zh">在图表页点右上角的三个点，选 Download My Data，得到一个 CSV 文件。</div></li>
-        <li>Repeat once per month if you want more history. A month per file is fine — we will stitch them together.
-          <div class="zh">想给更长的历史，就按月重复几次。每月一个文件没关系，我们会自己拼。</div></li>
+  <div class="step">
+    <div class="step-hd"><span class="num">1</span><h2>Tesla App 导出发电数据</h2></div>
+    <div class="step-body">
+      <ol>
+        <li>打开 Tesla App，进入 <code>Energy</code> 标签页。</li>
+        <li><b>先选时间范围</b>：点 <code>Month</code>（按月），或 <code>Lifetime</code>（全部）。</li>
+        <li>在图表页点右上角<b>三个点</b>，选 <code>Download My Data</code>，得到一个 CSV 文件。</li>
+        <li>顺手截一张图：<code>设置 → Powerwall</code> 里 <b>Backup Reserve</b> 的百分比。</li>
       </ol>
-      <div class="want">While you are in the app, two screenshots are worth more than they look: <strong>your Backup Reserve slider</strong> (Settings → Powerwall) and <strong>the date your system came online</strong>.
-        <div class="zh" style="margin-top:.35rem">顺手截两张图，价值超出你的想象：<b>备电预留（Backup Reserve）的百分比</b>（设置 → Powerwall），以及<b>系统上线日期</b>。</div></div>
-      <p class="note">Powerwall systems record battery charge level at 15-minute resolution. That single series — how full the battery is at 4pm each day — turns out to predict your peak-hour bill better than almost anything else we can measure.</p>
+      <p class="tip">第 2 步不能省——导出的就是屏幕上当前显示的那段时间。不选的话可能只拿到一天。</p>
     </div>
   </div>
 
-  <div class="task">
-    <div class="task-hd"><h2>Task B · Your SCE rate plan</h2><span class="cost">1 minute · browser</span></div>
-    <div class="task-body">
-      <ol class="steps">
-        <li>Sign in at <a href="https://www.sce.com/my-account" target="_blank" rel="noopener">sce.com/my-account</a>.
-          <div class="zh">登录 sce.com/my-account。</div></li>
-        <li>Find the name of your current rate plan — something like <code>TOU-D-PRIME</code>, <code>TOU-D-4-9PM</code> or <code>TOU-D-5-8PM</code>. It is printed on any bill PDF, and SCE also shows it under <strong>Find My Current Rate Plan</strong> in the Help Center.
-          <div class="zh">找到当前费率方案的名字，形如 TOU-D-PRIME / TOU-D-4-9PM / TOU-D-5-8PM。任何一期账单 PDF 上都有，SCE 帮助中心的 Find My Current Rate Plan 页面也能直接看到。</div></li>
+  <div class="step">
+    <div class="step-hd"><span class="num">2</span><h2>SCE 费率方案名称</h2></div>
+    <div class="step-body">
+      <ol>
+        <li>登录 <a href="https://www.sce.com/my-account" target="_blank" rel="noopener">sce.com/my-account</a>。</li>
+        <li>找到你当前的费率方案名称，形如 <code>TOU-D-PRIME</code> 或 <code>TOU-D-4-9PM</code>。任何一期账单 PDF 上都印着。</li>
+        <li>截图，或者直接把名字打给我们。</li>
       </ol>
-      <div class="want">Just the plan name is enough — a screenshot or the text. <strong>Everything we calculate in dollars depends on it</strong>, so this one-minute step gates the whole report.
-        <div class="zh" style="margin-top:.35rem">只要方案名称就够，截图或文字都行。<b>我们算出来的每一个美元数字都依赖它</b>，所以这一分钟卡着整份报告。</div></div>
     </div>
   </div>
 
-  <div class="task">
-    <div class="task-hd"><h2>Task C · SCE usage data</h2><span class="cost">5 minutes · browser</span></div>
-    <div class="task-body">
-      <ol class="steps">
-        <li>Still signed in, go to <strong>Data Sharing &amp; Download</strong>:<br><code>sce.com/mysce/abs/dataSharing</code>
-          <div class="zh">保持登录，进入 Data Sharing &amp; Download 页面。</div></li>
-        <li>Set the date range to the <strong>last 12 months</strong>. SCE keeps up to 36 months, but twelve is what the rate comparison needs.
-          <div class="zh">日期范围拉满最近 12 个月。SCE 最多保留 36 个月，但我们只需要 12 个月。</div></li>
-        <li>Choose <code>CSV</code>, not XML.
-          <div class="zh">格式选 CSV，不要 XML。</div></li>
-        <li>Download. A twelve-month export is a few megabytes and may arrive as a ZIP.
-          <div class="zh">下载。12 个月的导出文件几 MB，可能是个 ZIP 压缩包。</div></li>
+  <div class="step">
+    <div class="step-hd"><span class="num">3</span><h2>SCE 导出用电数据</h2></div>
+    <div class="step-body">
+      <ol>
+        <li>还是在 SCE 网站上，打开 <code>sce.com/mysce/abs/dataSharing</code></li>
+        <li>日期范围选<b>最近 12 个月</b>。</li>
+        <li>格式选 <code>CSV</code>，不要选 XML。</li>
+        <li>下载。文件可能是个 ZIP 压缩包，直接发过来就行。</li>
       </ol>
-      <p class="note">If the interval comes out hourly rather than 15-minute, send it anyway — it is still enough for the rate comparison, and we will tell you what it cannot resolve.</p>
+      <p class="tip">Tesla 和 SCE 都把导出功能叫 <code>Download My Data</code>，但是两个完全不同的文件，两个都需要。</p>
     </div>
   </div>
 
-  <div class="collide">
-    <h2>One thing that trips people up</h2>
-    <p><strong>Tesla and SCE both call their export “Download My Data.”</strong> They are different files from different places and we need both: Tesla gives us what your system produced and stored, SCE gives us what the meter charged you for.</p>
-    <p class="zh">Tesla 和 SCE 把各自的导出功能都叫做 “Download My Data”，但它们是两个完全不同的文件，两个都要。Tesla 那份说明你的系统发了多少、存了多少；SCE 那份说明电表按什么收了你的钱。</p>
+  <div class="warn">
+    <b>发送前请注意：</b>SCE 导出的文件最上面几行通常是你的<b>姓名、住址和账号</b>。用记事本或 Excel 打开删掉那几行再发。不删也行，我们收到后会删除，但你应该知道里面有这些。
   </div>
 
-  <div class="task">
-    <div class="task-hd"><h2>Optional · SCE’s own rate comparison</h2><span class="cost">2 minutes</span></div>
-    <div class="task-body">
-      <p>SCE has a free <strong>Rate Plan Comparison Tool</strong> in the Help Center that estimates each plan you qualify for against your own past usage. If you have eight months of history, run it and screenshot the result.</p>
-      <p class="zh">SCE 帮助中心有个免费的 Rate Plan Comparison Tool，用你自己的历史用电估算各方案费用。有 8 个月以上历史就能跑，跑一次并截图。</p>
-      <p class="note">We are asking because we want to check our own work against it — and because if their tool already answers the rate question well for a solar-and-battery household, we would rather tell you that than sell you an answer you can get free.</p>
-      <p class="zh" style="border-left:2px solid var(--rule-2);padding-left:.75rem">我们要这张截图是为了拿它检验我们自己的算法。如果 SCE 的工具对"光伏+储能"家庭已经算得够好，我们宁可直说，也不想卖给你一个你免费就能拿到的答案。</p>
-    </div>
-  </div>
-
-  <section>
-    <h2 style="margin-bottom:.7rem">Before you send anything</h2>
-    <div class="strip">The SCE file usually carries a few lines at the very top with your <strong>name, service address and account number</strong>, sitting above the actual usage rows. Open it in any text editor or spreadsheet and delete those lines. If you would rather not bother, we strip them on arrival and they never reach the analysis — but you should know they are in there before you attach the file to an email, to us or to anyone else.
-      <div class="zh" style="margin-top:.4rem">SCE 导出的文件顶部通常有几行是你的<b>姓名、服务地址和账号</b>，在真正的用电数据之上。用任何文本编辑器或表格软件删掉那几行即可。不删也行，我们收到后会剥离——但在把文件发给任何人之前，你应该知道里面有这些。</div></div>
-  </section>
-
-  <div class="check">
-    <h2>What lands in our inbox</h2>
+  <div class="done">
+    <h2>一共四样</h2>
     <ul>
-      <li>Tesla CSV — one file, or one per month <em>（系统未并网则跳过）</em></li>
-      <li>Screenshot: Backup Reserve percentage</li>
-      <li>Screenshot or text: your SCE rate plan name</li>
-      <li>SCE usage CSV — 12 months</li>
-      <li>Optional: screenshot of SCE’s rate comparison result</li>
+      <li>Tesla 的 CSV 文件</li>
+      <li>Backup Reserve 百分比的截图</li>
+      <li>SCE 费率方案名称</li>
+      <li>SCE 的用电 CSV（12 个月）</li>
     </ul>
-    <p class="note">Reply to the same email thread with whatever you have. Partial is fine — send Task B alone and we can already start. You do not have to finish everything before hearing from us.</p>
-    <p class="zh">直接回复同一封邮件，有多少发多少。只发 B 我们就能开始，不必集齐再发。</p>
+    <p style="font-size:.93rem;color:var(--ink-3)">不用集齐，有多少发多少，我们收到就能开始。</p>
   </div>
 
   <footer>
-    <p>What we do with these files, how long we keep them, and how to have them deleted: <a href="data-use.html">What happens to your data →</a></p>
-    <p>A person reads every one of these and writes your report by hand. Expect a day or two, not a minute.</p>
+    <p>这些文件我们只用来给你出这份报告，不转售、不给任何第三方，用完可随时要求删除。详见<a href="data-use.html">数据使用说明</a>。</p>
+    <p style="margin-top:.5rem">报告是人工写的，大概需要一两天。</p>
   </footer>
 
 </div>
