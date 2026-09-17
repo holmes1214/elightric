@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="给 Tian Ying 的取数指引：Tesla App 与 SCE 用电数据导出步骤。">
+<meta name="description" content="取数指引：一张电费账单 + 一份逆变器 App 导出。">
 <meta name="robots" content="noindex">
 <style>
   :root{color-scheme:light dark}
@@ -12,7 +12,7 @@
   img{max-width:100%}
   [hidden]{display:none!important}
 </style>
-<title>Tesla 与 SCE 取数</title>
+<title>账单与逆变器数据</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -51,6 +51,7 @@ body{background:var(--paper);color:var(--ink);
   display:flex;flex-direction:column;gap:1.6rem}
 h1{font-size:1.6rem;line-height:1.3;margin:0;font-weight:600;letter-spacing:-.01em}
 h2{font-size:1.05rem;margin:0;font-weight:600}
+h3{font-size:.95rem;margin:0;font-weight:600;color:var(--ink-2)}
 p{margin:0}
 .lede{color:var(--ink-2);font-size:1rem}
 
@@ -59,8 +60,8 @@ p{margin:0}
 .step-hd{padding:.75rem 1.1rem;border-bottom:1px solid var(--rule);background:var(--surface-2);
   display:flex;align-items:baseline;gap:.6rem}
 .num{font-family:"IBM Plex Mono",monospace;font-size:.95rem;font-weight:600;color:var(--known)}
-.step-body{padding:1.05rem 1.1rem;display:flex;flex-direction:column;gap:.7rem}
-ol{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:.65rem}
+.step-body{padding:1.05rem 1.1rem;display:flex;flex-direction:column;gap:.85rem}
+ol{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:.6rem}
 li{padding-left:.1rem}
 code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--surface-2);
   border:1px solid var(--rule);border-radius:2px;padding:.1em .38em;word-break:break-word;
@@ -69,6 +70,11 @@ code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--surf
   font-size:.93rem;color:var(--ink-2)}
 .warn{background:var(--no-wash);border-left:3px solid var(--no);padding:.8rem .9rem;
   font-size:.95rem;color:var(--ink-2);border-radius:0 3px 3px 0}
+
+.brand{border-top:1px dotted var(--rule);padding-top:.8rem;display:flex;
+  flex-direction:column;gap:.35rem}
+.brand:first-of-type{border-top:0;padding-top:0}
+.brand p{font-size:.95rem;color:var(--ink-2)}
 
 .done{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:1.1rem;
   display:flex;flex-direction:column;gap:.7rem}
@@ -87,60 +93,69 @@ footer{font-size:.88rem;color:var(--ink-3);line-height:1.6;
 <div class="wrap">
 
   <header style="display:flex;flex-direction:column;gap:.6rem">
-    <h1>Tian Ying，麻烦你花十分钟</h1>
-    <p class="lede">三件事，一件在手机上、两件在电脑上。做完回复邮件发给我们就行。</p>
+    <h1>两样东西，五分钟</h1>
+    <p class="lede">一张电费账单，一份逆变器 App 里的导出。不需要登录电力公司网站，不需要下载什么复杂的东西。</p>
   </header>
 
   <div class="step">
-    <div class="step-hd"><span class="num">1</span><h2>Tesla App 导出发电数据</h2></div>
+    <div class="step-hd"><span class="num">1</span><h2>最近一张电费账单</h2></div>
     <div class="step-body">
+      <p>三种方式，哪种顺手用哪种：</p>
       <ol>
-        <li>打开 Tesla App，进入 <code>Energy</code> 标签页。</li>
-        <li><b>先选时间范围</b>：点 <code>Month</code>（按月），或 <code>Lifetime</code>（全部）。</li>
-        <li>在图表页点右上角<b>三个点</b>，选 <code>Download My Data</code>，得到一个 CSV 文件。</li>
-        <li>顺手截一张图：<code>设置 → Powerwall</code> 里 <b>Backup Reserve</b> 的百分比。</li>
+        <li><b>转发邮件</b>——电力公司每月发的账单通知邮件，直接转发给我们。最省事。</li>
+        <li><b>拍照</b>——纸质账单，把<b>第一页</b>和写着 <code>Details of your new charges</code> 的那几页拍下来。</li>
+        <li><b>下载 PDF</b>——如果你能登录电力公司网站，在 Billing 里下载最近一期。</li>
       </ol>
-      <p class="tip">第 2 步不能省——导出的就是屏幕上当前显示的那段时间。不选的话可能只拿到一天。</p>
+      <p class="tip">账单上有一行写着你的<b>费率方案名称</b>（形如 <code>TOU-D-PRIME</code>、<code>TOUD-5-8PM</code>），还有分时段的用电量和单价。<b>我们算出的每一个数字都依赖这一页。</b></p>
     </div>
   </div>
 
   <div class="step">
-    <div class="step-hd"><span class="num">2</span><h2>SCE 费率方案名称</h2></div>
+    <div class="step-hd"><span class="num">2</span><h2>逆变器 App 里的导出</h2></div>
     <div class="step-body">
-      <ol>
-        <li>登录 <a href="https://www.sce.com/my-account" target="_blank" rel="noopener">sce.com/my-account</a>。</li>
-        <li>找到你当前的费率方案名称，形如 <code>TOU-D-PRIME</code> 或 <code>TOU-D-4-9PM</code>。任何一期账单 PDF 上都印着。</li>
-        <li>截图，或者直接把名字打给我们。</li>
-      </ol>
-    </div>
-  </div>
+      <p>按你家的品牌找对应的一条。都是手机上两三下的事。</p>
 
-  <div class="step">
-    <div class="step-hd"><span class="num">3</span><h2>SCE 导出用电数据</h2></div>
-    <div class="step-body">
-      <ol>
-        <li>还是在 SCE 网站上，打开 <code>sce.com/mysce/abs/dataSharing</code></li>
-        <li>日期范围选<b>最近 12 个月</b>。</li>
-        <li>格式选 <code>CSV</code>，不要选 XML。</li>
-        <li>下载。文件可能是个 ZIP 压缩包，直接发过来就行。</li>
-      </ol>
-      <p class="tip">Tesla 和 SCE 都把导出功能叫 <code>Download My Data</code>，但是两个完全不同的文件，两个都需要。</p>
+      <div class="brand">
+        <h3>Tesla Powerwall</h3>
+        <p><code>Energy</code> 标签页 → <b>先选时间范围</b>（<code>Month</code> 或 <code>Lifetime</code>）→ 图表页右上角<b>三个点</b> → <code>Download My Data</code>。</p>
+      </div>
+
+      <div class="brand">
+        <h3>Enphase</h3>
+        <p>Enphase App 或 <code>enlighten.enphaseenergy.com</code> → <code>System</code> / <code>Reports</code> → 生成并下载报告。</p>
+      </div>
+
+      <div class="brand">
+        <h3>SolarEdge</h3>
+        <p><code>monitoring.solaredge.com</code> 登录 → <code>Charts</code> → 右上角导出为 CSV/Excel。手机 App 里没有导出，要用浏览器。</p>
+      </div>
+
+      <div class="brand">
+        <h3>Solarman（多数国产混合逆变器）</h3>
+        <p>电脑浏览器打开 <code>home.solarmanpv.com</code>，用和手机 App 相同的账号登录 → 找 <code>Export Data</code> / 导出数据。<b>一次最多导 7 天</b>，导最近一周就够。</p>
+      </div>
+
+      <div class="brand">
+        <h3>其他品牌 / 找不到导出</h3>
+        <p>别花时间找了。<b>直接截图</b>：昨天的发电曲线、昨天的用电曲线，有电池的话再截一张电池电量曲线。告诉我们品牌型号，剩下的我们想办法。</p>
+      </div>
+
+      <p class="tip">有电池的话，顺手截一张<b>备电预留（Backup Reserve）百分比</b>的设置页。这个数字我们没别的办法知道。</p>
     </div>
   </div>
 
   <div class="warn">
-    <b>发送前请注意：</b>SCE 导出的文件最上面几行通常是你的<b>姓名、住址和账号</b>。用记事本或 Excel 打开删掉那几行再发。不删也行，我们收到后会删除，但你应该知道里面有这些。
+    <b>发送前请注意：</b>电力公司的账单和导出文件上有你的<b>姓名、住址和账号</b>。介意的话可以把那几处涂掉或删掉再发。不处理也行——我们收到后会剥离，只用其中的用电数据。
   </div>
 
   <div class="done">
-    <h2>一共四样</h2>
+    <h2>一共就这些</h2>
     <ul>
-      <li>Tesla 的 CSV 文件</li>
-      <li>Backup Reserve 百分比的截图</li>
-      <li>SCE 费率方案名称</li>
-      <li>SCE 的用电 CSV（12 个月）</li>
+      <li>一张电费账单（转发、拍照、PDF 都行）</li>
+      <li>逆变器 App 的导出文件，或者几张截图</li>
+      <li>有电池的话：备电预留百分比</li>
     </ul>
-    <p style="font-size:.93rem;color:var(--ink-3)">不用集齐，有多少发多少，我们收到就能开始。</p>
+    <p style="font-size:.93rem;color:var(--ink-3)">不用集齐，有多少发多少。只有账单我们也能开始。</p>
   </div>
 
   <footer>

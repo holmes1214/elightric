@@ -295,7 +295,7 @@ My system:
 - Installer: ${inst||"—"}
 - Utility: ${inPGE ? "PG&E (from ZIP)" : "NOT PG&E — outside covered territory"}
 
-(Reply and I'll send the Green Button steps.)`);
+(Reply and I'll send the two-item list.)`);
 
   document.getElementById("out").innerHTML = `
   <section class="tier t-known">
@@ -344,21 +344,21 @@ My system:
   </section>`}
 
   <section class="cta">
-    <h2>What we can tell you once you connect your data</h2>
-    <p style="margin:0">Sharing your ${inPGE?"PG&amp;E":"utility's"} 15-minute usage data (Green Button — one authorization, revocable any time) ${inPGE?"collapses every bar above into a single number, and gets":"gets"} specific:</p>
+    <h2>Two things turn this into your numbers</h2>
+    <p style="margin:0">Not a utility login, not a data authorization. <strong>One recent bill</strong> — forwarded, photographed, whatever is easiest — and <strong>one export from your inverter app</strong>, the one already on your phone. Together they ${inPGE?"collapse every bar above into a single number, and get":"get"} specific:</p>
     <ul>
-      <li>Which rate plan you should be on, and what the switch saves each month — recalculated against your actual last 12 months</li>
+      <li>Which rate plan you should be on, and what the switch saves each month — your bill names the plan and prices every hour of it</li>
       <li>What that device drawing power at 3 a.m. is, and what it costs you a year</li>
-      <li>Which of your timers are set to the wrong hours, and what each one is worth</li>
+      <li>Whether your battery is empty when the expensive hours start — the single best predictor of your peak-hour bill</li>
     </ul>
     <p class="handoff">This is the only point where anything leaves your device — and it leaves as an email you write and send yourself, so you can see exactly what's in it before it goes.</p>
     <a class="btn" href="mailto:${CONTACT}?subject=${subject}&body=${body}">Get the full report</a>
     <ol class="steps">
       <li>Your mail app opens with the five details above already filled in. Edit or delete anything before sending.</li>
-      <li>We send you ${inPGE?"PG&amp;E's":"your utility's"} Green Button steps. About two minutes.</li>
+      <li>We reply with the two-item list — a bill and an app export. About five minutes of your time.</li>
       <li>You get the full report within 48 hours.</li>
     </ol>
-    <p class="fine">We don't sell your data or pass it to anyone. You can revoke access from your PG&amp;E account at any time. Right now a person reads every request — we're early, and we'd rather do this properly than at scale. <a href="data-use.html" target="_blank" rel="noopener">What happens to your data →</a></p>
+    <p class="fine">We don't sell your data or pass it to anyone, and we never ask for a utility password. Say the word and everything you sent is deleted. Right now a person reads every request — we're early, and we'd rather do this properly than at scale. <a href="data-use.html" target="_blank" rel="noopener">What happens to your data →</a></p>
   </section>`;
   document.getElementById("mailnote").textContent =
     CONTACT.startsWith("REPLACE") ? "Setup note: replace CONTACT at the top of the script with a real inbox before sharing this page." : "";
